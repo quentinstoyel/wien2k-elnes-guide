@@ -1,0 +1,7 @@
+\BOOKMARK [1][-]{section.1}{Tools}{}% 1
+\BOOKMARK [1][-]{section.2}{Setup}{}% 2
+\BOOKMARK [1][-]{section.3}{Convergence}{}% 3
+\BOOKMARK [2][-]{subsection.3.1}{Cell parameters:}{section.3}% 4
+\BOOKMARK [1][-]{section.4}{Common Errors Thrown by Code}{}% 5
+\BOOKMARK [2][-]{subsection.4.1}{GMax Value less than Gmin}{section.4}% 6
+\BOOKMARK [2][-]{subsection.4.2}{K point and RKMax convergence}{section.4}% 7
