@@ -198,7 +198,7 @@ To converge these parameters, again start with very low values and then increase
 
 \section{TELNES3}
 
-Once the calculation is converged, ELNES can be calculated.  Again, there is a large list of parameters that must be set for in order to obtain reasonable results. It is also worth converging Kpoints and RKMax against the spectra as well.\\
+Once the calculation is converged, ELNES can be calculated.  There is a good deal of useful information and a complete description of the input file in the wien2k userguide, which should solve most issues. Again, there is a large list of parameters that must be set for in order to obtain reasonable results. It is also worth converging Kpoints and RKMax against the spectra as well.\\
 The majority of the important parameters need to be set in the \textbf{case.innes} file, which is easiest through w2web.  Choose the right atom (in this case Li1) for the edge, and the right atomic numbers:  
 
 \begin{table}[H]
@@ -221,9 +221,40 @@ Set the energy grid to a large range of values, eg -20-50eV so you can see all o
 
 In addition to the case.innes parameters, increase the number of kpoints, to at least double, or 10$\times$, so that there is less doubt about this being converged, use x kgen for this.  \\
 
-Increase the upper energy limit in case.in1 from 1.5 to $\sim$ 2-3.5, see picture.  This value defines how many higher energy states are included in Ry (1 Ry $\approx$13.6 eV, 1.5Ry $\approx$ 20eV). Therefore, to obtain the correct ELNES for features more than 20eV from the onset,  this should be increased.  \\
+Increase the upper energy limit in case.in1 from 1.5 to $\sim$ 2-3.5, see picture.  This value defines how many higher energy states are included in Ry (1 Ry $\approx$13.6 eV, 1.5Ry $\approx$ 20eV). Therefore, to obtain the correct ELNES for features more than 20eV from the onset,  this should be increased to match.  \\
 
 \includegraphics[scale=0.4]{./images/in1_edit.png}
+
+x lapw1 -p, x qtl -telnes -p, and x telnes3 can then all be run in succession.  These are relatively slow commands, so to avoid waiting on them, run all three in sequence from the command line: \$ x lapw1 -p \&\& x qtl -telnes -p \&\& x telnes3.\\
+
+Once telnes3 is finished, edit case.inb and play with the spectrometer broadening on the last line, before clicking ``x broadening" to generate the final spectra. To experiment with different broadening values, just repeat these steps.  Sometimes w2web gets stuck and stops re-broadening the spectra, in which case, just delete the case.broadspec file and run ``x broadening" again.   Plot the spectrum in a new tab (ctrl+click on ``plot") for easy comparison to new spectra without having to save it. Rerun all the TELNES steps, but with a higher/lower number of kpoints to confirm that that is not effecting the spectra. At this point you can also uncheck the ``calculate and write DOS" checkboxes in case.innes, which allow you to rerun telnes without needing to rerun lapw1 each time (unless you change the k points/case.in1 file).  \\
+
+\subsection{Monopole effects}
+Because the lithium 1S state is quite delocalized, it is susceptible to monopole effects.  These cause in artifacts in the spectra resulting from non orthogonal states at the muffin tin boundary.  Fortunately, it is easy to check for them.  Return to the case.innes file and change the interaction order to 0. \\
+
+
+\includegraphics[scale=0.5]{./images/innes_monopole.png}
+
+Telnes now only calculates the monopole component, look in case.outputelnes to confirm this.  Compare the monopole contribution to the full spectra, it should be much smaller ($\sim$100$\times$).  If it is not, set the interaction order to 1 to enforce dipole selection and use that for all future spectra.
+
+
+\section{Core Hole}
+To introduce a core hole, start an entirely new case, and copy only the struct file.  Open a terminal in the new directory and run ``x supercell." Enter the struct file name, size of the supercell (2$\times$2$\times$2 is generally enough), no vacuum or shift.  Open the new file (case\_super.struct) in vesta, and make sure it looks right. The most  important part of this process is to somehow isolate a single lithium atom so only one core hole gets inserted into the cell:\\
+
+\includegraphics[scale=0.5]{./images/isolated_struct.png}
+
+When the struct file is ready, initialize using the converged parameters (RMT, RKMax) from the single cell case, and decrease the k points according to the size of the supercell.  After init\_lapw, insert a core hole into the cell by editing case.inc and case.inm: \\
+
+\includegraphics[scale=0.5]{./images/hole_inc.png}
+
+In case.inc, a hole is inserted by changing the occupancy of an orbital.  Each set of lines corresponds to the core states of each atom defined in the struct file.  This is why it is important to be able to treat the lithium states as core states, otherwise it would not be possible to insert a hole.  This is also why it is important to break the symmetry in the unit cell as if not this would insert holes into multiple atoms. In the case.inm file, the excited electrons need to be added to the background charge: \\
+
+\includegraphics[scale=0.5]{./images/hole_inm.png}
+
+The value is negative as this operation adds charge, not electron number.  If for whatever reason, symmetry cannot be broken in the unit cell, this value would be increased according to the multiplicity of the excited atom.  Don't do this though, as it defies the point of using a supercell.   Once the background charge is added, execute run\_lapw -p.  
+
+
+
 
 
 \section{Common Errors Thrown by Code}

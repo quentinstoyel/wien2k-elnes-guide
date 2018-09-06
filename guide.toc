@@ -4,6 +4,8 @@
 \contentsline {subsection}{\numberline {3.1}Cell parameters:}{6}{subsection.3.1}
 \contentsline {subsection}{\numberline {3.2}K point and RKMax convergence}{7}{subsection.3.2}
 \contentsline {section}{\numberline {4}TELNES3}{7}{section.4}
-\contentsline {section}{\numberline {5}Common Errors Thrown by Code}{8}{section.5}
-\contentsline {subsection}{\numberline {5.1}NN in Optimization}{8}{subsection.5.1}
-\contentsline {subsection}{\numberline {5.2}GMax Value less than Gmin}{9}{subsection.5.2}
+\contentsline {subsection}{\numberline {4.1}Monopole effects}{9}{subsection.4.1}
+\contentsline {section}{\numberline {5}Core Hole}{9}{section.5}
+\contentsline {section}{\numberline {6}Common Errors Thrown by Code}{11}{section.6}
+\contentsline {subsection}{\numberline {6.1}NN in Optimization}{11}{subsection.6.1}
+\contentsline {subsection}{\numberline {6.2}GMax Value less than Gmin}{11}{subsection.6.2}
