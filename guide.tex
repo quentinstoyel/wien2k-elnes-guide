@@ -67,9 +67,9 @@ Sample .machines file:
 #This is a valid .machines file
 #
 granularity:1
-1:localhost #as many of these lines as you want cpu cores running
-1:localhost
-1:localhost
+1:localhost  #as many of these lines as you want cpu cores running
+1:localhost  #ideally pick a multiple of kpoint number 
+1:localhost  #so don't use 5 cores for 13 k points...
 1:localhost
 1:localhost
 1:localhost
@@ -110,7 +110,7 @@ Now we need to initialize the case.  You can do this in w2web, but we are going 
 	
 \end{itemize}  
 
-To fix the leakage problem, the Lithium muffin tins must be bigger.Ideally they should be just big enough to hold all of the 1S electrons, without making them too different from the other muffin tins, as the larger this difference, the harder things get to calculate/converge.  In this case, try Li=1.8,  C=1.2, O=1.22 and try init\_lapw again, if that still didn't work (lstart still had leakage errors), keep going until it does, in this case RMT's of Li=2.0,  C=1.14, O=1.22.  At this point you should be able to run through init\_lapw quite quickly.  Go through it one last time in full to make sure everything is set correctly: 
+To fix the leakage problem, the Lithium muffin tins need to be bigger.   Ideally, they should be just big enough to hold all of the 1S electrons, without making them too different from the other muffin tins, as the larger this difference, the harder things get to calculate/converge.  In this case, try Li=1.8,  C=1.2, O=1.22 and try init\_lapw again, if that still didn't work (lstart still had leakage errors), keep going until it does, in this case RMT's of Li=2.0,  C=1.14, O=1.22.  These RMT values are too different ($\mathrm{RMT_{Li}} \approx 2\mathrm{RMT_C}$) and will cause errors further along.  The solution here is to simply accept the leakage (ignore the warnings) and acknowledge that it might be unavoidably causing artifacts.  Alternatively, pick a nicer structure to analyze.  
 
 \begin{itemize}
 	\item \textbf{setrmt}: Setrmt will try to reset the muffin tins to the defaults, make sure to discard these (enter d)
@@ -257,7 +257,21 @@ The value is negative as this operation adds charge, not electron number.  If fo
 
 
 
-\section{Common Errors Thrown by Code}
+\section{Common Errors/Issues Encountered in Wien2k}
+
+\subsection{Setting RMT/RKMax}
+The RKMax value is a little obscure and takes some getting used to.   It is defined as the Muffin Tin Radii $\times$ Maximum K point vector.   The maximum k point corresponds to the highest frequency plane wave used in the calculation.  
+
+\begin{figure}[H]
+	\includegraphics[scale=0.5]{./images/low_rkmax.png}
+	\includegraphics[scale=0.5]{./images/high_rkmax.png}	\caption*{Two case, both with 5 kpoints and different RKMax's.  The plot on the left depicts a smaller RKMax relative to the one on the right.}
+\end{figure}
+
+
+Increasing RKMax allows for higher frequency (more precise) plane waves to be used in the basis set.  These high frequency terms are however more computationally costly (CPU requirements scale as RKMax$^3$) and less essential for describing large features. This is why the RKMax includes the Muffin Tin radius: large atoms only require lower frequency plane waves.  Each atom has an effective RKMax which  is relative to the ratio of its radius and that of the smallest atom.  Choosing very different muffin tin radii for different elements leads to issues as it becomes more difficult to align the surface features of each atom.  \\
+
+Increasing RKMax arbitrarily does not solve the problem either, as: 1. ``approximate numerical linear dependency" occurs and 2. Calculations become prohibitively expensive.  RKMax should at most be  between 9-10.  
+
 
 \subsection{NN in Optimization}
 Crashes the first scf cycle almost immediately, due to overlapping muffin tins resulting from a decreased cell size.  Solution: decrease all muffin tin sizes before running ``x optimize".

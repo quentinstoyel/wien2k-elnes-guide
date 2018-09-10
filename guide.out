@@ -6,6 +6,7 @@
 \BOOKMARK [1][-]{section.4}{TELNES3}{}% 6
 \BOOKMARK [2][-]{subsection.4.1}{Monopole effects}{section.4}% 7
 \BOOKMARK [1][-]{section.5}{Core Hole}{}% 8
-\BOOKMARK [1][-]{section.6}{Common Errors Thrown by Code}{}% 9
-\BOOKMARK [2][-]{subsection.6.1}{NN in Optimization}{section.6}% 10
-\BOOKMARK [2][-]{subsection.6.2}{GMax Value less than Gmin}{section.6}% 11
+\BOOKMARK [1][-]{section.6}{Common Errors/Issues Encountered in Wien2k}{}% 9
+\BOOKMARK [2][-]{subsection.6.1}{Setting RMT/RKMax}{section.6}% 10
+\BOOKMARK [2][-]{subsection.6.2}{NN in Optimization}{section.6}% 11
+\BOOKMARK [2][-]{subsection.6.3}{GMax Value less than Gmin}{section.6}% 12
