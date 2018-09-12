@@ -2,14 +2,16 @@
 \contentsline {section}{\numberline {2}Setup}{2}{section.2}
 \contentsline {section}{\numberline {3}Convergence}{6}{section.3}
 \contentsline {subsection}{\numberline {3.1}Cell parameters:}{6}{subsection.3.1}
-\contentsline {subsection}{\numberline {3.2}K point and RKMax convergence}{7}{subsection.3.2}
+\contentsline {subsection}{\numberline {3.2}K point and RKMax convergence}{8}{subsection.3.2}
 \contentsline {section}{\numberline {4}TELNES3}{8}{section.4}
 \contentsline {subsection}{\numberline {4.1}Monopole effects}{10}{subsection.4.1}
-\contentsline {section}{\numberline {5}Core Hole}{10}{section.5}
-\contentsline {section}{\numberline {6}Density Calculations}{13}{section.6}
-\contentsline {section}{\numberline {7}Common Errors/Issues Encountered in Wien2k}{15}{section.7}
-\contentsline {subsection}{\numberline {7.1}Setting RMT/RKMax}{15}{subsection.7.1}
-\contentsline {subsection}{\numberline {7.2}Ghostbands}{16}{subsection.7.2}
-\contentsline {subsection}{\numberline {7.3}NN in Optimization}{17}{subsection.7.3}
+\contentsline {section}{\numberline {5}Core Hole}{11}{section.5}
+\contentsline {section}{\numberline {6}Density Calculations}{14}{section.6}
+\contentsline {subsection}{\numberline {6.1}Xcrysden}{14}{subsection.6.1}
+\contentsline {subsection}{\numberline {6.2}Critic2}{14}{subsection.6.2}
+\contentsline {section}{\numberline {7}Common Errors/Issues Encountered in Wien2k}{16}{section.7}
+\contentsline {subsection}{\numberline {7.1}Setting RMT/RKMax}{16}{subsection.7.1}
+\contentsline {subsection}{\numberline {7.2}Ghostbands}{17}{subsection.7.2}
+\contentsline {subsection}{\numberline {7.3}NN in Optimization}{18}{subsection.7.3}
 \contentsline {subsection}{\numberline {7.4}GMax Value less than Gmin}{18}{subsection.7.4}
-\contentsline {subsection}{\numberline {7.5}Ordering}{18}{subsection.7.5}
+\contentsline {subsection}{\numberline {7.5}Ordering}{19}{subsection.7.5}

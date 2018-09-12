@@ -40,6 +40,8 @@ Here's a list of software I use to run simulations.  I've put some installation 
 	
 	\item  VESTA: \url{http://jp-minerals.org/vesta/en/download.html}.  Download the .rpm file, install it with your package manager in the directory it was downloaded to, eg. ``sudo apt-get vesta...rpm"
 	
+	\item Xcrysden: \url{http://www.xcrysden.org/Download.html}.  Download the appropriate tar for your operating system, and make sure to select the semishared version.  Unzip it, and just run ``\$./xcrysden".  Add the executable to your path in .bashrc to be able to run it anywhere.
+	
 	\item Critic2: \url{https://github.com/aoterodelaroza/critic2}.  Download the zip from GitHub, unzip where you want to install it eg $\sim$/Programs or something), use your package manager (dnf/apt-get) to install  autoconf, automake, and your favourite flavour of fortran (if unsure, it is probably gfortran).  Then run the 4 commands from the readme: ``autoreconf -i", ``./configure", ``make", and ``(sudo) make install".   You may or may not need the sudo for the last one. 
 	
 \end{itemize}
@@ -250,23 +252,14 @@ With all core holes, it is essential to remove the symmetry in the unit cell, so
 
 \includegraphics[scale=0.5]{./images/isolated_struct.png}
 
-To achieve this, the cell must be reduced to a P1 space group.  This can be done in VESTA.  Import the struct file and set the space group to P1, under ``Edit $\to$  Edit Data $\to$ Unit Cell." Select space group No. 1, and apply. \\
+To achieve this, the cell must be reduced to a P1 space group.  This can be done in VESTA.  Import the struct file and ``remove symmetry", under ``Edit $\to$  Edit Data $\to$ Unit Cell." The spacegroup should switch to P-1, then select ``apply" \\
 
 \includegraphics[scale=0.3]{./images/vesta_struct_edit.png}\\
 
- To save these changes select ``File $\to$ Export data" and save the structure as a .cif.  Because there are some bugs in the Wien2k-VESTA interface, the cif needs to be edited a bit manually as well.  Open the cif and delete the following line in the initial block of data: 
+To save these changes select ``File $\to$ Export data" and save the structure as a .cif.  
 
-\begin{lstlisting}
-_space_group_name_H-M_alt              'P 1'
-\end{lstlisting}
-
-and replace it with this line at the top of that block: 
-
-\begin{lstlisting}
-_symmetry_space_group_name_H-M   'P 1'
-\end{lstlisting}
-
-Running \textbf{Cif2struct name\_of\_cif.cif} should then be able to generate a valid struct file, which should be renamed as case.struct.  \\
+Running \textbf{Cif2struct name\_of\_cif.cif} should then be able to generate a valid struct file, which should be renamed as case.struct.  For some reason, I am only able to do this with my local install of wien2k/cif2struct, the remote version complains about `` Space group name nor symmetry operations are not given!"  I have attached the final struct file that I used to the github directory. It might be necessary to install wien2k after all... 
+ \\
 
 In the new struct file, add a ``1" to the end of an atom (AND DELETE A SPACE).  The file should look like this: \\
 
@@ -293,7 +286,14 @@ To make a supercell, run \textbf{x supercell} in the directory and make a 2$\tim
 
 
 \section{Density Calculations}
-Density calculations can be done using Critic2. Documentation for the code, while very complete, is just a giant txt file. The code takes three inputs: the case.struct file, the case.clmsum file, and an input parameters file ``more.cri".  A sample .cri file is below: 
+Density calculations can be done using either xcrysden (qualitative) or Critic2 (quantitative).
+
+
+\subsection{Xcrysden}
+Xcyrsden density rendering is well explained in the online wien2k tutorials to which the reader is referred to.  Depending on your particular setup, density rendering with xcrysden may need to be performed locally, which will also require install wien2k locally. 
+
+\subsection{Critic2}
+The documentation for critic, while very complete, is in a giant txt file. The code takes three inputs: the case.struct file, the case.clmsum file, and an input parameters file ``more.cri".  A sample .cri file is below: 
 
 \begin{lstlisting}
 crystal ./Li2CO3.struct
@@ -325,7 +325,7 @@ The two values indicated by the arrows are the volume of the basin and how many 
 
 \includegraphics[scale=0.4]{./images/spheres.png}\\ 
 
-By matching to the volume value, relatively comparable values should be attainable, in the no hole case.  The reason for performing two types of population calculation is due to the fact that the atomic basins can become ill defined when a core hole is inserted.  This is revealed when the volume of the basin is dramatically larger ($>$ 20\%) than the no hole case.  In these situations, a comparison of the sphere integrals at the same volume (set by the basin volume in the no hole case) is more appropriate.  \\
+By matching to the volume value, relatively comparable values should be attainable (2.10 vs 2.14), in the no hole case.  The reason for performing two types of population calculation is due to the fact that the atomic basins can become ill defined when a core hole is inserted.  This is revealed when the volume of the basin is dramatically larger ($>$ 20\%) than the no hole case.  In these situations, a comparison of the sphere integrals at the same volume (set by the basin volume in the no hole case) is more appropriate.  \\
 
 Once density calculations are performed for both hole and no-hole cases, core hole screening can be calculated by comparing the values.  For example if the no-hole population is: 2.17, and the core hole population is 1.5, the hole would be screened by:  (1.5 + 1) - 2.17 =  0.33 electrons. The +1 is to account for the excited electron.  To implement this effect, a third, final supercell calculation is required,  with a reduced hole inserted.  case.inc would need an occupancy of 1.33 and case.inm would need a background charge of -0.67. \\
 
