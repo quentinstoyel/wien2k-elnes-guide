@@ -327,8 +327,9 @@ The two values indicated by the arrows are the volume of the basin and how many 
 
 By matching to the volume value, relatively comparable values should be attainable (2.10 vs 2.14), in the no hole case.  The reason for performing two types of population calculation is due to the fact that the atomic basins can become ill defined when a core hole is inserted.  This is revealed when the volume of the basin is dramatically larger ($>$ 20\%) than the no hole case.  In these situations, a comparison of the sphere integrals at the same volume (set by the basin volume in the no hole case) is more appropriate.  \\
 
-Once density calculations are performed for both hole and no-hole cases, core hole screening can be calculated by comparing the values.  For example if the no-hole population is: 2.17, and the core hole population is 1.5, the hole would be screened by:  (1.5 + 1) - 2.17 =  0.33 electrons. The +1 is to account for the excited electron.  To implement this effect, a third, final supercell calculation is required,  with a reduced hole inserted.  case.inc would need an occupancy of 1.33 and case.inm would need a background charge of -0.67. \\
+In the case of Li2CO3, the no hole case had a population of 2.11 and the no hole case had a population of 1.20 (and a smaller basin volume).  This indicates that the core hole is slightly screened and has an effective strength of (1.20 +1)-2.11 = 0.91.  The +1 is to account for the excited electron. To implement this effect, a third, final supercell calculation is required,  with a reduced hole inserted.  case.inc would need an occupancy of 1.09 and case.inm would need a background charge of -0.91. This can be rapidly set up by copying the struct file from the full hole calculation and initializing from there.\\
 
+  
 \section{Common Errors/Issues Encountered in Wien2k}
 
 \subsection{Setting RMT/RKMax}
