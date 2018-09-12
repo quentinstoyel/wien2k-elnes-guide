@@ -36,17 +36,17 @@
 Here's a list of software I use to run simulations.  I've put some installation instructions for linux as needed.  
 
 \begin{itemize}
-	\item Wien2k  - If you are reading this guide, you either already have it installed somewhere, or should figure out how to do that before buying a license.  
+	\item Wien2k  - If you are reading this guide, you either already have it installed somewhere, or should figure out how to do that before buying a license.  Otherwise, read the userguide where the installation process is well explained. 
 	
-	\item  VESTA: \url{http://jp-minerals.org/vesta/en/download.html}.  Download the .rpm file, install it with your package manager, eg. ``sudo apt-get vesta...rpm"
+	\item  VESTA: \url{http://jp-minerals.org/vesta/en/download.html}.  Download the .rpm file, install it with your package manager in the directory it was downloaded to, eg. ``sudo apt-get vesta...rpm"
 	
-	\item Critic2: \url{https://github.com/aoterodelaroza/critic2}.  Download the zip from GitHub, unzip where you want to install it eg $\sim$/Programs or something), install (using dnf/apt-get) autoconf, automake, and your favourite flavour of fortran.  Then run the 4 commands from the readme: ``autoreconf -i", ``./configure", ``make", and ``(sudo) make install".   You may or may not need the sudo for the last one. 
+	\item Critic2: \url{https://github.com/aoterodelaroza/critic2}.  Download the zip from GitHub, unzip where you want to install it eg $\sim$/Programs or something), use your package manager (dnf/apt-get) to install  autoconf, automake, and your favourite flavour of fortran (if unsure, it is probably gfortran).  Then run the 4 commands from the readme: ``autoreconf -i", ``./configure", ``make", and ``(sudo) make install".   You may or may not need the sudo for the last one. 
 	
 \end{itemize}
 	
 \section{Setup}	
 
-We need a couple things to get started for ELNES simulations.  Foremost is a crystal structure.  You can either get this from the literature, XRD, or alternatively Materials Project: \url{https://materialsproject.org/}.  Download a cif (the primative cell typically) or enter the coordinates directly into the wien2k struct gen tool.  
+There a couple things required to start ELNES simulations.  Foremost is a crystal structure.  This can be obtained from the literature, XRD, or alternatively Materials Project: \url{https://materialsproject.org/}.  Download a cif (the primative cell typically) or enter the coordinates directly into the wien2k struct gen tool.  \\
 
 Make a new Wien2k session: 
 \begin{figure}[H]
@@ -69,7 +69,7 @@ Sample .machines file:
 granularity:1
 1:localhost  #as many of these lines as you want cpu cores running
 1:localhost  #ideally pick a multiple of kpoint number 
-1:localhost  #so don't use 5 cores for 13 k points...
+1:localhost  #so something like 5 cores for 10 k points.
 1:localhost
 1:localhost
 1:localhost
@@ -77,7 +77,7 @@ granularity:1
 \end{lstlisting}
 
 Next, go make a struct file, with struct gen, either by importing the cif, or entering the positions manually.  Use VESTA (drag n' drop the .struct file) to make sure that the structure is what you'd expect. 
-In our Li2CO3 case this looks like: 
+In the Li2CO3 case this looks like: 
 
 	\begin{figure}[H]
 	\includegraphics[scale=0.4]{./images/Li2CO3_struct.png}
@@ -94,9 +94,9 @@ The next step is initialization.  This is best done via the command line as it g
 		\includegraphics[scale=0.4]{./images/init_lapw2.png}
 	\end{figure}
 	
-	\item \textbf{sgroup}. Verifies the space group.  Again, accept any changes the program makes, these steps are all about reducing the cell to the smallest unit cell. Again, the files can be largely  ignored at this point, with the exception of indication of a Bravais lattice change, in which case, accept the new struct file. If so, nn and sgroup will run again with ``nice" results.  
+	\item \textbf{sgroup}. Verifies the space group.  Again, accept any changes the program makes, this first run is all about reducing the cell to the smallest unit cell. Again, the files can be largely  ignored at this point, unless there is an indication of a Bravais lattice change, in which case, accept the new struct file. If so, nn and sgroup will run again with ``nice" results.  
 	\item  \textbf{symmery}. Generates all the symmetry operations. Run it and continue (enter ``c")
-	\item  \textbf{lstart}. Set spin state, select which XC kernel, define cutoff between core and valence states.  Accept default spins (up, the no spin case), unless there is a transition metal involved. Select GGA PBE as the XC potential, again, unless there is reason to suspect otherwise. Picking the energy is the most important part of this first run init\_lapw: the aim is to get the Li 1s states to be treated as core states.  They typically have energies of $\sim$-3.7Ry, so try with -3.5 Ry to make sure they will be treated as core states and look in case.outputst (the file that pops up), for the following lines for the lithium atom and look at the 1S states:  
+	\item  \textbf{lstart}. Sets the spin state, selects which XC kernel, and defines cutoff between core and valence states.  Accept default spins (up, the no spin case), unless there is a transition metal involved. Select GGA PBE as the XC potential, again, unless there is reason to suspect otherwise. Picking the energy is the most important part of this first run init\_lapw: the aim is to get the Li 1s states to be treated as core states.  They typically have energies of $\sim$-3.8Ry, so try with -3.5 Ry to make sure they will be treated as core states and look in case.outputst (the file that pops up), for the following lines for the lithium atom and look at the 1S states:  
 	
 	\begin{lstlisting}
           E-up(Ry)      E-dn(Ry)   Occupancy   q/sphere  core-state
@@ -106,11 +106,11 @@ The next step is initialization.  This is best done via the command line as it g
 2S      -0.236699     -0.003313  1.00  0.00    0.0468  F
 	\end{lstlisting}
 	
-	These indicate the core states (T/F), their energy levels (in this case $\sim$ -3.8eV) and how much the electrons in these states live in the muffin tins (0.9859).  As this is less than 1, it means a lot of 1S lithium electron is leaking out of the muffin tins, which is why there should now be all kinds of warnings popping up.  So go ahead and ``ctrl-c" out of init\_lapw.
+	These indicate the core states (T/F), their energy levels (in this case $\sim$ -3.8eV) and how much the electrons in these states are contained in the muffin tins (0.9859).  As this is less than 1, it means that some 1S lithium electron is leaking out of the muffin tins, which is why there should now be all kinds of warnings popping up.  So go ahead and ``ctrl-c" out of init\_lapw.
 	
 \end{itemize}  
 
-To fix the leakage problem, the Lithium muffin tins need to be bigger.   Ideally, they should be just big enough to hold all of the 1S electrons, without making them too different from the other muffin tins, as the larger this difference, the harder things get to calculate/converge.  In this case, try Li=1.8,  C=1.2, O=1.22 and try init\_lapw again, if that still didn't work (lstart still had leakage errors), keep going until it does, in this case RMT's of Li=2.0,  C=1.14, O=1.22.  These RMT values are too different ($\mathrm{RMT_{Li}} \approx 2\mathrm{RMT_C}$) and will cause errors  (ghostbands) further along.  The solution here is to try and minimize the leakage (and ignore the warnings) and acknowledge that it might be unavoidably causing artifacts. For this case I chose Li=1.8, C = 1.17, O=1.26. Alternatively, pick a nicer structure to analyze.  Once the spheres are set in the struct file, rerun \textbf{init\_lapw:}
+To fix the leakage problem, the Lithium muffin tins need to be bigger.   Ideally, they should be just big enough to hold all of the 1S electrons, without making them too different from the other muffin tins, as the larger this difference, the harder things get to calculate/converge.  In this case, try Li=1.8,  C=1.2, O=1.22 and try init\_lapw again making sure to discard the suggested muffin tins from \textbf{setrmt}. If that still didn't work (lstart still has leakage errors), keep going until it does, in this case RMT's of Li=2.0,  C=1.14, O=1.22.  These RMT values are too different ($\mathrm{RMT_{Li}} \approx 2\mathrm{RMT_C}$) and will cause errors  (ghostbands) further along.  The solution here is to try and minimize the leakage (and ignore the warnings) and acknowledge that it might be unavoidably causing artifacts. For this case I chose Li=1.8, C = 1.17, O=1.26. Alternatively, pick a nicer structure to analyze.  Once the spheres are set in the struct file, rerun \textbf{init\_lapw:}
 
 \begin{itemize}
 	\item \textbf{setrmt}: Setrmt will try to reset the muffin tins to the defaults, make sure to discard these (enter d)
@@ -129,7 +129,7 @@ To fix the leakage problem, the Lithium muffin tins need to be bigger.   Ideally
 Assuming there were no warnings in the final run through init\_lapw, the case can begin to be converged.
 
 \section{Convergence}
-Ideally, every variable should be converged regarding the simulation.  Typically this is cell parameters, k points and Rkmax.  The first step is to just make sure the calculation converges, running it with a small RKmax and few kpoints and making sure it finishes without error.  
+Ideally, every variable should be converged regarding the simulation.  Typically this is cell parameters, k points and Rkmax.  The first step is to just make sure the calculation converges, running it with a small RKmax and few kpoints and making sure it finishes without error.  Once finished altering parameters in \textbf{init\_lapw}, run \textbf{\$ run\_lapw -p} to start a calculation.  If errors occur, search for them in  the userguide, or in the final chapter of this guide.  Otherwise proceed with convergence.  
 
 \subsection{Cell parameters:}
 This process works best from W2Web, as described in the tutorials and using the muffin tins from \textbf{setrmt} reduced by a healthy percentage ($\sim$ 5-10\%) to avoid nn errors (you may need to rerun \textbf{init\_lapw}).    As  a number (5-11+) of calculations are run in this process, a low number of k points and RKMax values is ideal here. For Li2CO3, I used 16 kpoints and an RKmax of 6.   In the x ``optimize" tab, choose what you want to optimize, the first option (volume) works well, unless there are suspicions otherwise.  Enter a range of values of test volumes, see picture:
@@ -153,7 +153,7 @@ You can then ``run optimize.job" from w2web. This job is okay to run in the back
   
 \includegraphics[scale=0.3]{./images/E_vs_V.png}
 
-In the case of Li2CO3 and the cif from materials project, quite a range of volume options were needed to locate the minimum.  The graph indicates that a 3-4\% increase should correspond to the optimized structure.  To use this structure, search the case directory for all the struct files and rename the appropriate one to case.struct, for Li2CO3 this was ``Li2CO3\_vol\_\_\_3.0.struct $\to$ Li2CO3.struct". Alternatively, cut and paste the lattice parameters from this file into the w2web structgen tool.    Finally, rerun init\_lapw and readjust sphere sizes as necessary to account for the increase (or decrease) in cell size. 
+In the case of Li2CO3 and the cif from materials project, quite a range of volume options were needed to locate the minimum.  The graph indicates that a 3-4\% increase should correspond to the optimized structure.  To use this structure, search the case directory for all the struct files and rename the appropriate one to case.struct, for Li2CO3 this was ``Li2CO3\_vol\_\_\_3.0.struct $\to$ Li2CO3.struct". Alternatively, cut and paste the lattice parameters from this file into the w2web structgen tool.    Finally, rerun \textbf{init\_lapw} and readjust sphere sizes as necessary to account for the increase (or decrease) in cell size. 
 
 \subsection{K point and RKMax convergence}
 
@@ -162,7 +162,7 @@ To converge these parameters, again start with very low values and then increase
 \begin{itemize}
 	\item set/increase kpoints or RKMax, either by re-running ``x kgen" or editing case.in1 and case.in1\_st.
 	
-	\item Run the scf cycle using ``run\_lapw -p -NI", the NI flag means it will continue from where the previous calculation left off which saves time. I would still run your final choice from scratch though.
+	\item Run the scf cycle using ``run\_lapw -p -NI", the NI flag means it will continue from where the previous calculation left off which can save time. The final converged choice should still be run from scratch though.
 	
 	\item Check the energy in case.scf.  To do this, find it in ``scf files" on w2web and use ctrl+f in your browser to search the file for ``:ene" , which should appear in a line that looks like: 
 	
@@ -195,6 +195,7 @@ To converge these parameters, again start with very low values and then increase
 
 \end{table}
 
+Depending on the case, the energy will only converge so far.  For the above table, I would choose 16 k points and RKMax of 8.0.  there were only minimal changes ($<$0.001Ry) to the energy beyond those. 
 
 \section{TELNES3}
 
@@ -283,7 +284,7 @@ In case.inc, a hole is inserted by changing the occupancy of an orbital.  Each s
 
 \includegraphics[scale=0.5]{./images/hole_inm.png}
 
-The value is negative as this operation adds charge, not electron number.  Once the background charge is added, execute \textbf{run\_lapw -p} and calculate the ELNES.  If done correctly, your elnes should look something like this:  
+The value is negative as this operation adds charge, not electron number.  Once the background charge is added, execute \textbf{run\_lapw -p} and calculate the ELNES.  If done correctly, the ELNES should look something like this:  
 
 \includegraphics[scale=0.4]{./images/single_cell_hole_elnes.png}\\
 
@@ -306,11 +307,11 @@ The first line inputs the crystal structure, and then tells the code where to fi
 
 The third line determines the location of all the critical points.  \\
 
-The 4th line calculates the electron population inside the atomic basin surrounding critical point 1.  ``Gauleg" is a integration option, look in the critic documentation for more options.  The two 50's are sampling parameters, increase/decrease these for more/less accurate calculations.  \\
+The 4th line calculates the electron population inside the atomic basin surrounding critical point 1.  ``Gauleg" is an integration option, look in the critic documentation for more options.  The two 50's are sampling parameters, increase/decrease these for more/less accurate calculations.  \\
 
-The 5th line calculates the electron population in spheres surrounding critical point 1. ``gualeg 50 50" mean the exact same as on the previous line, R0 is the starting radius, 1d-1 is the radius step size, REND is the final radius (in bohr).\\
+The 5th line calculates the electron population in spheres surrounding critical point 1. ``gualeg 50 50" mean the exact same as on the previous line, R0 is the starting radius, 1d-1 sets the radius step size, REND is the final radius (in bohr).\\
 
-The program is run using \textbf{\$ critic2 < more.cri > case.cro} in the command line in the case directory.  Te final file (case.cro) is just where the output is stored and can be called anything.  To determine which critical points are needed for the integrals, look at the complete cp list in the output file: \\
+The program is run using \textbf{\$ critic2 $<$ more.cri $>$ case.cro} in the command line in the case directory.  The final file (case.cro) is just where the output is stored and can be called anything.  To determine which critical points are needed for the integrals, look at the complete cp list in the output file: \\
 
 \includegraphics[scale=0.4]{./images/cro_cplist.png}\\
 
