@@ -112,7 +112,7 @@ The next step is initialization.  This is best done via the command line as it g
 	
 \end{itemize}  
 
-To fix the leakage problem, the Lithium muffin tins need to be bigger.   Ideally, they should be just big enough to hold all of the 1S electrons, without making them too different from the other muffin tins, as the larger this difference, the harder things get to calculate/converge.  In this case, try Li=1.8,  C=1.2, O=1.22 and try init\_lapw again making sure to discard the suggested muffin tins from \textbf{setrmt}. If that still didn't work (lstart still has leakage errors), keep going until it does, in this case RMT's of Li=2.0,  C=1.14, O=1.22.  These RMT values are too different ($\mathrm{RMT_{Li}} \approx 2\mathrm{RMT_C}$) and will cause errors  (ghostbands) further along.  The solution here is to try and minimize the leakage (and ignore the warnings) and acknowledge that it might be unavoidably causing artifacts. For this case I chose Li=1.8, C = 1.17, O=1.26. Alternatively, pick a nicer structure to analyze.  Once the spheres are set in the struct file, rerun \textbf{init\_lapw:}
+To fix the leakage problem, the Lithium muffin tins need to be bigger.   Ideally, they should be just big enough to hold all of the 1S electrons, without making them too different from the other muffin tins, as the larger this difference, the harder things get to calculate/converge.  In this case, try Li=1.8,  C=1.2, O=1.22 and try init\_lapw again making sure to discard the suggested muffin tins from \textbf{setrmt}. If that still didn't work (lstart still has leakage errors), keep going until it does, in this case RMT's of Li=2.0,  C=1.14, O=1.22.  These RMT values are too different ($\mathrm{RMT_{Li}} \approx 2\mathrm{RMT_C}$) and will cause errors  (ghostbands) further along.  The solution here is to try and minimize the leakage (and ignore the warnings) and acknowledge that it might be unavoidably causing artifacts. For this case I chose Li=1.8, C = 1.17, O=1.24. Alternatively, pick a nicer structure to analyze.  Once the spheres are set in the struct file, rerun \textbf{init\_lapw:}
 
 \begin{itemize}
 	\item \textbf{setrmt}: Setrmt will try to reset the muffin tins to the defaults, make sure to discard these (enter d)
@@ -120,11 +120,11 @@ To fix the leakage problem, the Lithium muffin tins need to be bigger.   Ideally
 	\item \textbf{sgroup} Should run fine.
 	\item  \textbf{symmery} Should run fine. 
 	\item \textbf{lstart} Now that the lithium 1S states are well contained, core states can be selected based on containment instead of energy, meaning, the higher energy states (2S, P) of other elements can still be treated as valence.  Entering 0.99 should be sufficient here, but make sure to verify that the lithium states are still core states.
-	\item \textbf{kgen} Set the RkMax value in case.in1\_st:		
+	\item \textbf{kgen} Set the RkMax value in case.in1\_st from 7 to the desired value:		
 	\begin{figure}[H]
 		\includegraphics[scale=0.4]{./images/init_lapw3.png}
 	\end{figure}
-	and then pick a k\_point number.  Both of these values should initially be taken for fast convergence, in this case I chose RkMax=6.0, and 8 k points (Li2CO3 is an insulator, for metals 1000 k points is a good starting point).
+	and then pick a k\_point number.  Both of these values should initially be taken for fast convergence, in this case I chose RkMax=6.0, and 16 k points (Li2CO3 is an insulator, for metals 1000 k points is a good starting point).
 	\item \textbf{Dstart}: make sure to pick non spin polarized, unless there is reason to believe otherwise (is there a transition metal in the sample?)
 \end{itemize}
 
@@ -155,7 +155,7 @@ You can then ``run optimize.job" from w2web. This job is okay to run in the back
   
 \includegraphics[scale=0.3]{./images/E_vs_V.png}
 
-In the case of Li2CO3 and the cif from materials project, quite a range of volume options were needed to locate the minimum.  The graph indicates that a 3-4\% increase should correspond to the optimized structure.  To use this structure, search the case directory for all the struct files and rename the appropriate one to case.struct, for Li2CO3 this was ``Li2CO3\_vol\_\_\_3.0.struct $\to$ Li2CO3.struct". Alternatively, cut and paste the lattice parameters from this file into the w2web structgen tool.    Finally, rerun \textbf{init\_lapw} and readjust sphere sizes as necessary to account for the increase (or decrease) in cell size. 
+In the case of Li2CO3 and the cif from materials project, quite a range of volume options were needed to locate the minimum.  The graph indicates that a 3-4\% increase should correspond to the optimized structure.    To use this structure, search the case directory for all the struct files and rename the appropriate one to case.struct, for Li2CO3 this was ``Li2CO3\_vol\_\_\_3.0.struct $\to$ Li2CO3.struct". Alternatively, cut and paste the lattice parameters from this file into the w2web structgen tool.    Finally, rerun \textbf{init\_lapw} and readjust sphere sizes as necessary to account for the increase (or decrease) in cell size. It turns out here, that running \textbf{setrmt} using the old method gives spheres of Li=1.77, C,O=1.18 which does a good job of keeping leakage down while containing the Li core electrons.  
 
 \subsection{K point and RKMax convergence}
 
@@ -281,9 +281,11 @@ The value is negative as this operation adds charge, not electron number.  Once 
 
 \includegraphics[scale=0.4]{./images/single_cell_hole_elnes.png}\\
 
-To make a supercell, run \textbf{x supercell} in the directory and make a 2$\times$1$\times$1.  Then use the same procedure to keep the symmetry broken: import to vesta, select P1 spacegroup, save cif, edit spacegroup line in cif, cif2struct, relabel an atom with a number, and then run \textbf{init\_lapw}.  Reduce K points by a factor of 2 (the unit cell is now twice as big), and keep the RKMax from earlier.  Insert a hole in case.inc, case.inm and then \textbf{run\_lapw}.  
+To make a supercell, run \textbf{x supercell} in the directory and make a 2$\times$1$\times$1.  Then use the same procedure to keep the symmetry broken: import to vesta, select P1 spacegroup, save cif, cif2struct, relabel an atom with a number, and then run \textbf{init\_lapw}.  Reduce K points by a factor of 2 (the unit cell is now twice as big), and keep the RKMax from earlier.  Insert a hole in case.inc, case.inm and then \textbf{run\_lapw}.  If everything goes well, this should give something like this: 
 
+\includegraphics[scale=0.4]{./images/211_cell_hole_elnes.png}\\
 
+In this situation, this is sufficiently different (the peak locations change as well as their relative intensities) to justify a full 2$\times$2$\times$2 supercell calculation.  
 
 \section{Density Calculations}
 Density calculations can be done using either xcrysden (qualitative) or Critic2 (quantitative).
@@ -379,6 +381,9 @@ To handle ghostbands, either delete the relevant local orbital line (lines that 
 \subsection{NN in Optimization}
 Crashes the first scf cycle almost immediately, due to overlapping muffin tins resulting from a decreased cell size.  Solution: decrease all muffin tin sizes before running ``x optimize".
 
+\subsection{NR and NT}
+Before considering a spectra as final, it is important to verify that it is converged with respect to the Q mesh as well.  The Q mesh defines which changes in momentum are collectable by the detector.  More information on exactly how the mesh is determined can be found in the Telnes section of the userguide.  To test convergence, increase these values from NR=5, and NT=2 to larger values, (eg. 7,3), rerun telnes( qtl and telnes3) and make sure that the fine structure does not change.  
+
 
 \subsection{GMax Value less than Gmin}
 
@@ -396,15 +401,6 @@ If a calculation run apparently unchanged, a possible reason is that all the edi
 \end{itemize}
 
 
-
-\begin{itemize}
-	\item \textbf{setrmt}
-	\item \textbf{nn}
-	\item \textbf{sgroup}
-	\item  \textbf{symmery}
-	\item \textbf{lstart}
-	
-\end{itemize}
 
 
 \end{document}
