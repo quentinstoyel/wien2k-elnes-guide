@@ -46,9 +46,27 @@ Here's a list of software I use to run simulations.  I've put some installation 
 	
 \end{itemize}
 	
+\section{Path}
+Here is the overall list of things that need to be done to rigorously obtain ELNES spectra with WIEN2k:
+
+\begin{itemize}
+	\item Load structure
+	\item Initialize
+	\item Volume convergence/structure optimization
+	\item Set RMT values
+	\item K point/RKmax convergence
+	\item Calculate DOS, PDOS
+	\item Calculate ELNES
+	\item Include Core Hole, if indicated by PDOS
+	\item Calculate Screening from density
+	\item Calculate ELNES from partial hole
+\end{itemize}
+
+
 \section{Setup}	
 
-There a couple things required to start ELNES simulations.  Foremost is a crystal structure.  This can be obtained from the literature, XRD, or alternatively Materials Project: \url{https://materialsproject.org/}.  Download a cif (the primative cell typically) or enter the coordinates directly into the wien2k struct gen tool.  \\
+\subsection{Load Structure}
+There a couple things required to start ELNES simulations.  Foremost is a crystal structure.  This can be obtained from the literature, XRD, or alternatively Materials Project: \url{https://materialsproject.org/}.  Download a cif (the primative cell typically) or enter the coordinates directly into the wien2k struct gen tool, set the rmt and save the file.  \\
 
 Make a new Wien2k session: 
 \begin{figure}[H]
@@ -79,17 +97,17 @@ granularity:1
 \end{lstlisting}
 
 Next, go make a struct file, with struct gen, either by importing the cif, or entering the positions manually.  Use VESTA (drag n' drop the .struct file) to make sure that the structure is what you'd expect. 
-In the Li2CO3 case this looks like: 
+In the Li2O case this looks like: 
 
 	\begin{figure}[H]
-	\includegraphics[scale=0.4]{./images/Li2CO3_struct.png}
+	\includegraphics[scale=0.35]{./images/Li2O_struct.png}
 \end{figure}
 
-
-The next step is initialization.  This is best done via the command line as it give a little more flexibility and intuition than in w2web, and will need to be run multiple times.  Run \textbf{init\_lapw} and go through the following steps:
+\subsection{Initialization}
+The next step is initialization.  This is best done via the command line as it give a little more flexibility and intuition than in w2web, and will need to be run multiple times. The first time will be to set up the calculation for volume optimization, which needs smaller muffin tins.  Run \textbf{init\_lapw} and go through the following steps:
 
 \begin{itemize}
-	\item \textbf{setrmt}. Sets the muffin tin size on the atoms.  Reduce the sphere size by 0\% using either old or new scheme and accept, it doesn't matter much as these will be reset properly later.
+	\item \textbf{setrmt}. Sets the muffin tin size on the atoms.  Reduce the sphere size by 5-10\% (I used 7\%), using either old or new scheme and accept.
 	\item  \textbf{nn}.  Checks for overlapping muffin tins. Enter ``2.0", close the first file and use the new NN file if suggested, run \textbf{nn} with 2.0 again, look at how much ``wiggle room" you have on the spheres, by comparing the ``sums to" and the ``nn-dist" for every atom, see below:
 	
 	\begin{figure}[H]
@@ -98,34 +116,16 @@ The next step is initialization.  This is best done via the command line as it g
 	
 	\item \textbf{sgroup}. Verifies the space group.  Again, accept any changes the program makes, this first run is all about reducing the cell to the smallest unit cell. Again, the files can be largely  ignored at this point, unless there is an indication of a Bravais lattice change, in which case, accept the new struct file. If so, nn and sgroup will run again with ``nice" results.  
 	\item  \textbf{symmery}. Generates all the symmetry operations. Run it and continue (enter ``c")
-	\item  \textbf{lstart}. Sets the spin state, selects which XC kernel, and defines cutoff between core and valence states.  Accept default spins (up, the no spin case), unless there is a transition metal involved. Select GGA PBE as the XC potential, again, unless there is reason to suspect otherwise. Picking the energy is the most important part of this first run init\_lapw: the aim is to get the Li 1s states to be treated as core states.  They typically have energies of $\sim$-3.8Ry, so try with -3.5 Ry to make sure they will be treated as core states and look in case.outputst (the file that pops up), for the following lines for the lithium atom and look at the 1S states:  
-	
-	\begin{lstlisting}
-          E-up(Ry)      E-dn(Ry)   Occupancy   q/sphere  core-state
-1S      -3.801947     -3.785288  1.00  1.00    0.9859  T
-1S      -3.801947     -3.785288  1.00  1.00    0.9859  T
-2S      -0.236699     -0.003313  1.00  0.00    0.0468  F
-2S      -0.236699     -0.003313  1.00  0.00    0.0468  F
-	\end{lstlisting}
-	
-	These indicate the core states (T/F), their energy levels (in this case $\sim$ -3.8eV) and how much the electrons in these states are contained in the muffin tins (0.9859).  As this is less than 1, it means that some 1S lithium electron is leaking out of the muffin tins, which is why there should now be all kinds of warnings popping up.  So go ahead and ``ctrl-c" out of init\_lapw.
-	
-\end{itemize}  
-
-To fix the leakage problem, the Lithium muffin tins need to be bigger.   Ideally, they should be just big enough to hold all of the 1S electrons, without making them too different from the other muffin tins, as the larger this difference, the harder things get to calculate/converge.  In this case, try Li=1.8,  C=1.2, O=1.22 and try init\_lapw again making sure to discard the suggested muffin tins from \textbf{setrmt}. If that still didn't work (lstart still has leakage errors), keep going until it does, in this case RMT's of Li=2.0,  C=1.14, O=1.22.  These RMT values are too different ($\mathrm{RMT_{Li}} \approx 2\mathrm{RMT_C}$) and will cause errors  (ghostbands) further along.  The solution here is to try and minimize the leakage (and ignore the warnings) and acknowledge that it might be unavoidably causing artifacts. For this case I chose Li=1.8, C = 1.17, O=1.24. Alternatively, pick a nicer structure to analyze.  Once the spheres are set in the struct file, rerun \textbf{init\_lapw:}
-
-\begin{itemize}
-	\item \textbf{setrmt}: Setrmt will try to reset the muffin tins to the defaults, make sure to discard these (enter d)
-	\item \textbf{nn} Make sure you don't get errors, and that everything is as tight as it can be, in this case the Oxygen-carbon spacing is the limiting factor.  
-	\item \textbf{sgroup} Should run fine.
-	\item  \textbf{symmery} Should run fine. 
-	\item \textbf{lstart} Now that the lithium 1S states are well contained, core states can be selected based on containment instead of energy, meaning, the higher energy states (2S, P) of other elements can still be treated as valence.  Entering 0.99 should be sufficient here, but make sure to verify that the lithium states are still core states.
-	\item \textbf{kgen} Set the RkMax value in case.in1\_st from 7 to the desired value:		
+	\item  \textbf{lstart}. Sets the spin state, selects which XC kernel, and defines cutoff between core and valence states.  Accept default spins (up, the no spin case), unless there is a transition metal involved. Select GGA PBE as the XC potential, again, unless there is reason to suspect otherwise. For the purposes of volume optimization, the defualt energy value (-6.0 Ry) works well.
+		\item \textbf{kgen} Set the RkMax value in case.in1\_st from 7 to the desired value:		
 	\begin{figure}[H]
 		\includegraphics[scale=0.4]{./images/init_lapw3.png}
 	\end{figure}
-	and then pick a k\_point number.  Both of these values should initially be taken for fast convergence, in this case I chose RkMax=6.0, and 16 k points (Li2CO3 is an insulator, for metals 1000 k points is a good starting point).
+	and then pick a k\_point number.  Both of these values should initially be taken for fast convergence, in this case I chose RkMax=6.0, and 16 k points (Li2O is an insulator, for metals 1000 k points is a good starting point).
 	\item \textbf{Dstart}: make sure to pick non spin polarized, unless there is reason to believe otherwise (is there a transition metal in the sample?)
+	
+
+
 \end{itemize}
 
 Assuming there were no warnings in the final run through init\_lapw, the case can begin to be converged.
@@ -134,7 +134,7 @@ Assuming there were no warnings in the final run through init\_lapw, the case ca
 Ideally, every variable should be converged regarding the simulation.  Typically this is cell parameters, k points and Rkmax.  The first step is to just make sure the calculation converges, running it with a small RKmax and few kpoints and making sure it finishes without error.  Once finished altering parameters in \textbf{init\_lapw}, run \textbf{\$ run\_lapw -p} to start a calculation.  If errors occur, search for them in  the userguide, or in the final chapter of this guide.  Otherwise proceed with convergence.  
 
 \subsection{Cell parameters:}
-This process works best from W2Web, as described in the tutorials and using the muffin tins from \textbf{setrmt} reduced by a healthy percentage ($\sim$ 5-10\%) to avoid nn errors (you may need to rerun \textbf{init\_lapw}).    As  a number (5-11+) of calculations are run in this process, a low number of k points and RKMax values is ideal here. For Li2CO3, I used 16 kpoints and an RKmax of 6.   In the x ``optimize" tab, choose what you want to optimize, the first option (volume) works well, unless there are suspicions otherwise.  Enter a range of values of test volumes, see picture:
+This process works best from W2Web, as described in the tutorials and using the muffin tins from \textbf{setrmt} reduced by a healthy percentage ($\sim$ 5-10\%) to avoid nn errors (you may need to rerun \textbf{init\_lapw}).    As  a number (5-11+) of calculations are run in this process, a low number of k points and RKMax values is ideal here. For Li2O, I used 16 kpoints and an RKmax of 6.   In the x ``optimize" tab, choose what you want to optimize, the first option (volume) works well, unless there are suspicions otherwise.  Enter a range of values of test volumes, see picture:
 
 \begin{figure}[H]
 
@@ -155,7 +155,26 @@ You can then ``run optimize.job" from w2web. This job is okay to run in the back
   
 \includegraphics[scale=0.3]{./images/E_vs_V.png}
 
-In the case of Li2CO3 and the cif from materials project, quite a range of volume options were needed to locate the minimum.  The graph indicates that a 3-4\% increase should correspond to the optimized structure.    To use this structure, search the case directory for all the struct files and rename the appropriate one to case.struct, for Li2CO3 this was ``Li2CO3\_vol\_\_\_3.0.struct $\to$ Li2CO3.struct". Alternatively, cut and paste the lattice parameters from this file into the w2web structgen tool.    Finally, rerun \textbf{init\_lapw} and readjust sphere sizes as necessary to account for the increase (or decrease) in cell size. It turns out here, that running \textbf{setrmt} using the old method gives spheres of Li=1.77, C,O=1.18 which does a good job of keeping leakage down while containing the Li core electrons.  
+In the case of Li2O, the used lattice parameter of 4.6590 \angstrom results in the minimum energy, so no further changes are needed. If we needed a structure with a different lattice parameter, search the case directory for all the struct files and rename the appropriate one to case.struct, eg ``Li2O\_vol\_\_\_3.0.struct $\to$ Li2O.struct". Alternatively, cut and paste the lattice parameters from this file into the w2web structgen tool.    
+
+\subsection{Setting the Muffin Tin Size}
+This is the first step of the process that is specific to calculating the Lithium ELNES.  In order to do this, te lithium 1S state needs to be treated as a core state.  This requires playing with the muffin tin radius and the energy cutoff value in lstart.  Rerun \textbf{init\_lapw} with no reduction in muffin tin size, and during lstart, use a cuutoff energy of -3.5 Ry (The Li 1 S state has an energy of -3.8 Ry).  Investigate the case.outputst file (it should pop up) for the following lines for the lithium atom and look at the 1S states: 
+
+
+\begin{lstlisting}
+          E-up(Ry)     E-dn(Ry)  Occupancy   q/sphere  core-state
+1S      -3.801968     -3.785309  1.00  1.00    0.9904  T
+1S      -3.801968     -3.785309  1.00  1.00    0.9904  T
+2S      -0.236711     -0.003297  1.00  0.00    0.0595  F
+2S      -0.236711     -0.003297  1.00  0.00    0.0595  F
+
+\end{lstlisting}
+
+These indicate the core states (T/F), their energy levels (in this case $\sim$ -3.8eV) and how much the electrons in these states are contained in the muffin tins (0.9859).  As this is less than 1, it means that some 1S lithium electron is leaking out of the muffin tins, which is why there should now be all kinds of warnings popping up.  So go ahead and ``ctrl-c" out of init\_lapw.
+
+
+To fix the leakage problem, the Lithium muffin tins need to be bigger.   Ideally, they should be just big enough to hold all of the 1S electrons, without making them too different from the other muffin tins, as the larger this difference, the harder things get to calculate/converge.  In this case, try Li=2.0, O=1.8 and try init\_lapw again making sure to discard the suggested muffin tins from \textbf{setrmt}. If that still didn't work (lstart still has leakage errors), keep going until it does.  If the RMT values are too different (eg if $\mathrm{RMT_{Li}} \approx 1.5 \mathrm{RMT_O}$) they will cause errors  (ghostbands) further along.  The solution then is to try and minimize the leakage (and ignore the warnings) and acknowledge that it might be unavoidably causing artifacts. Once the spheres are set in the struct file, rerun \textbf{init\_lapw}.
+
 
 \subsection{K point and RKMax convergence}
 
@@ -164,12 +183,12 @@ To converge these parameters, again start with very low values and then increase
 \begin{itemize}
 	\item set/increase kpoints or RKMax, either by re-running ``x kgen" or editing case.in1 and case.in1\_st.
 	
-	\item Run the scf cycle using ``run\_lapw -p -NI", the NI flag means it will continue from where the previous calculation left off which can save time. The final converged choice should still be run from scratch though.
+	\item Run the scf cycle using ``run\_lapw -p -NI", the NI flag means it will continue from where the previous calculation left off which can save time. The final converged choice should still be run from scratch though (rerun init\_lapw, rm *broyd* before running run\_lapw)
 	
 	\item Check the energy in case.scf.  To do this, find it in ``scf files" on w2web and use ctrl+f in your browser to search the file for ``:ene" , which should appear in a line that looks like: 
 	
 		\begin{lstlisting}
-:ENE  : ********** TOTAL ENERGY IN Ry =        -1116.50733157
+:ENE  : ********** TOTAL ENERGY IN Ry =        -180.82588608
 		\end{lstlisting}
 	
 	There will be one of these lines for each scf cycle, so find the last one in the document and note the energy. 
@@ -185,11 +204,12 @@ To converge these parameters, again start with very low values and then increase
 
 			kpoints & RKMax & Energy \\
 			\hline
-			8 & 7.0 &  -1116.5073\\
-			16 & 7.0 & -1116.4971\\
-			32 & 7.0 & -1116.4975\\
-			32 & 8.0 & -1116.5038\\
-			32 & 9.0 & -1116.5045\\
+			16 & 6.0 & -180.82588608\\
+			32 & 6.0 & -180.85055185\\
+			64 & 6.0 & -180.85166466\\
+			32 & 7.0 & -180.85723055\\
+			32 & 8.0 & -180.85860820\\
+			32* & 8.0* & -180.85977640\\
 			
 			
 
@@ -197,7 +217,29 @@ To converge these parameters, again start with very low values and then increase
 
 \end{table}
 
-Depending on the case, the energy will only converge so far.  For the above table, I would choose 16 k points and RKMax of 8.0.  there were only minimal changes ($<$0.001Ry) to the energy beyond those. 
+Depending on the case, the energy will only converge so far.  For the above table, I would choose 32 k points and RKMax of 8.0.  there were only minimal changes ($<$0.001Ry) to the energy beyond those. The starred case indicate the calculation being run from scratch.  
+
+
+\section{Density of States}
+In order to determine whether or not a core hole is necessary, the first step is to analyze the DOS.  These are best calculated in w2web, clicking the buttons.
+
+To start, run the optional steps and increase the upper energy limit in case.in1 from 1.5 to $\sim$ 2-3.5, see picture.  This value defines how many higher energy states are included in Ry (1 Ry $\approx$13.6 eV, 1.5Ry $\approx$ 20eV). Therefore, to obtain the correct DOS and ELNES for features more than 20eV from the onset,  this should be increased to match.  \\
+
+\includegraphics[scale=0.4]{./images/in1_edit.png}
+
+Then boost the k points value by an order of magnitude to pull out the finer features in the DOS, and run \textbf{x lapw -p} and \textbf{x lpaw2 -qtl -p}.   Then select the total DOS of each atom  in case.int, using the w2web interface:
+
+\includegraphics[scale=0.4]{./images/tetra_states.png}
+
+Run \textbf{x tetra} and plot the DOS with dosplot, which should give you something like this: 
+
+
+\includegraphics[scale=0.4]{./images/Li2O_dos.png}
+
+What we are looking for here is whether the conduction band has a large component of unoccupied lithium states, which it does in this case, indicated by the arrows.  If the unoccupied states were purely oxygen in nature, no core hole effect would be expected, as there would be no states to alter effecting the ELNES.  For more insight on this behavior, the reader is referred to Mauchamp, Jaouen and Schattschneider (2009) ``Core-hole effect in the one-particle approximation revisited from density functional theory.
+
+As there is indeed a large component of lithium states in the low conduction band, a core hole is necessary. Before that, we calculate an initial ELNES for comparison later.  
+
 
 \section{TELNES3}
 
@@ -222,7 +264,7 @@ Next, set the edge onset, edge values can be found at \url{http://www.kayelaby.n
 
 Set the energy grid to a large range of values, eg -20-50eV so you can see all of the features that might appear.  The defaults for the remaining values should be fine.\\
 
-In addition to the case.innes parameters, increase the number of kpoints, to at least double, or 10$\times$, so that there is less doubt about this being converged, use \textbf{x kgen} for this.  \\
+In addition to the case.innes parameters, increase the number of kpoints, to at least double, or 10$\times$, so that there is less doubt about this being converged, use \textbf{x kgen} for this. This should already have been done for calculating the DOS.   \\
 
 Increase the upper energy limit in case.in1 from 1.5 to $\sim$ 2-3.5, see picture.  This value defines how many higher energy states are included in Ry (1 Ry $\approx$13.6 eV, 1.5Ry $\approx$ 20eV). Therefore, to obtain the correct ELNES for features more than 20eV from the onset,  this should be increased to match.  \\
 
@@ -230,9 +272,9 @@ Increase the upper energy limit in case.in1 from 1.5 to $\sim$ 2-3.5, see pictur
 
 \textbf{x lapw1 -p, x qtl -telnes -p}, and\textbf{ x telnes3} can then all be run in succession.  These are relatively slow commands, so to avoid waiting on them, run all three in sequence from the command line: \textbf{\$ x lapw1 -p \&\& x qtl -telnes -p \&\& x telnes3.}\\
 
-Once telnes3 is finished, edit case.inb and play with the spectrometer broadening on the last line, before clicking ``x broadening" to generate the final spectra. To experiment with different broadening values, just repeat these steps.  Sometimes w2web gets stuck and stops re-broadening the spectra, in which case, just delete the case.broadspec file and run ``x broadening" again.   Plot the spectrum in a new tab (ctrl+click on ``plot") for easy comparison to new spectra without having to save it. Rerun all the TELNES steps, but with a higher/lower number of kpoints to confirm that that is not effecting the spectra. At this point you can also uncheck the ``calculate and write DOS" checkboxes in case.innes, which allow you to rerun telnes without needing to rerun\textbf{ lapw1} each time (unless you change the k points/case.in1 file).  If everything went well, the ELNES should look something like:   \\
+Once telnes3 is finished, edit case.inb and play with the spectrometer broadening on the last line, before clicking ``x broadening" to generate the final spectra. To experiment with different broadening values, just repeat these steps.  Sometimes w2web gets stuck and stops re-broadening the spectra, in which case, just delete the case.broadspec file and run ``x broadening" again.   Plot the spectrum in a new tab (ctrl+click on ``plot") for easy comparison to new spectra without having to save it. Rerun all the TELNES steps, but with a higher/lower number of kpoints to confirm that that is not effecting the spectra. At this point you can also uncheck the ``calculate and write DOS" checkboxes in case.innes, which allow you to rerun telnes without needing to rerun\textbf{ lapw1} each time (unless you change the k points/case.in1 file).  If everything went well, the ELNES should look something like (broadening = 0.5):   \\
 
-\includegraphics[scale=0.4]{./images/no_hole_elnes.png}
+\includegraphics[scale=0.4]{./images/Li_edge_no-hole.png}
 
 \subsection{Monopole effects}
 Because the lithium 1S state is quite delocalized, it is susceptible to monopole effects.  These cause artifacts in the spectra resulting from non orthogonal states at the muffin tin boundary.  Fortunately, it is easy to check for them.  Return to the case.innes file and change the interaction order to 0. \\
@@ -244,9 +286,11 @@ Telnes now only calculates the monopole component, look in case.outputelnes to c
 
 
 \section{Core Hole}
-To introduce a core hole, start an entirely new case, and copy only the struct file.  Because of the periodic boundary conditions, it is sometimes necessary to use a supercell to avoid core holes interacting with themselves in neighbouring cells. This depends largely on the size of the original unit cell, for a single atom case (metallic lithium) a 3$\times$3$\times$3 cell is required, for large calcium phosphates, no cell is needed. \\
+To introduce a core hole, start an entirely new case, and copy only the struct and the .machines files.  Because of the periodic boundary conditions, it is often necessary to use a supercell to avoid core holes interacting with themselves in neighbouring cells. This depends largely on the size of the original unit cell, for a single atom case (metallic lithium) a 3$\times$3$\times$3 cell is required, for large calcium phosphates, no cell is needed. \\
 
-Li2CO3 is a mid sized cell.  To verify that there is no interaction, the single cell case with a core hole will be compared to a 2$\times$1$\times$1 supercell.  If there is any significant variation in results a 2$\times$2$\times$2 supercell will be necessary.  \\
+Li2O is a small sized cell, so a 2$\times$2$\times$2 supercell is a good starting point, which would need to be compared to a 3$\times$3$\times$3 supercell for full rigorousness.  \\
+
+To generate the supercell, run \textbf{x supercell} in the new directory and use the copied struct file, with no shift. 
 
 With all core holes, it is essential to remove the symmetry in the unit cell, so there is only a single hole per cell: 
 
@@ -261,38 +305,46 @@ To save these changes select ``File $\to$ Export data" and save the structure as
 Running \textbf{Cif2struct name\_of\_cif.cif} should then be able to generate a valid struct file, which should be renamed as case.struct.  For some reason, I am only able to do this with my local install of wien2k/cif2struct, the remote version complains about `` Space group name nor symmetry operations are not given!"  I have attached the final struct file that I used to the github directory. It might be necessary to install wien2k after all... 
  \\
 
-In the new struct file, add a ``1" to the end of an atom (AND DELETE A SPACE).  The file should look like this: \\
+In the new struct file, add a ``1" to the end of a lithium atom (AND DELETE A SPACE).  The file should look like this: \\
 
 \includegraphics[scale=0.8]{./images/break_sym.png}
 \\
 
-Now run \textbf{init\_lapw} and accept all of the defaults proposed by \textbf{nn}, which may require cycling through \textbf{nn } a couple times.  \textbf{sgroup} should not have any suggestions here, if it does, something has gone wrong and it is trying to restore all of the symmetry.  At the end of \textbf{init\_lapw}, make sure to double check that the struct file is still what it should be.  
+Now run \textbf{init\_lapw} and accept all of the defaults proposed by \textbf{nn}, which may require cycling through \textbf{nn } a couple times.  \textbf{sgroup} should not have any suggestions here, if it does, something has gone wrong and it is trying to restore all of the symmetry.  At the end of \textbf{init\_lapw}, make sure to double check that the struct file is still what it should be in VESTA.  
 
 
-When the struct file is ready, initialize use the converged parameters (RMT, RKMax) from the single cell case.  After init\_lapw, insert a core hole into the cell by editing case.inc and case.inm: \\
+When the struct file is ready, initialize use the converged parameters (RMT, RKMax) from the single cell case. (divide the number of k points appropriately, in this case by 8)  After init\_lapw, insert a core hole into the cell by editing case.inc and case.inm: \\
 
 \includegraphics[scale=0.5]{./images/hole_inc.png}
 
-In case.inc, a hole is inserted by changing the occupancy of an orbital.  Each set of lines corresponds to the core states of each atom defined in the struct file.  This is why it is important to be able to treat the lithium states as core states, otherwise it would not be possible to insert a hole.  This is also why it is important to break the symmetry in the unit cell as if not, this would insert holes into multiple atoms. In the case.inm file, the excited electrons need to be added to the background charge: \\
+In case.inc, a hole is inserted by changing the occupancy of an orbital, the trick in this case is picking out one of the isolated lithium atoms (with mult=1) which depends on where you added the 1 to the struct file.  Each set of lines corresponds to the core states of each atom defined in the struct file.  This is why it is important to be able to treat the lithium states as core states, otherwise it would not be possible to insert a hole.  This is also why it is important to break the symmetry in the unit cell as if not, this would insert holes into multiple atoms. In the case.inm file, the excited electrons need to be added to the background charge: \\
 
 \includegraphics[scale=0.5]{./images/hole_inm.png}
 
-The value is negative as this operation adds charge, not electron number.  Once the background charge is added, execute \textbf{run\_lapw -p} and calculate the ELNES.  If done correctly, the ELNES should look something like this:  
+The value is negative as this operation adds charge, not electron number.  Once the background charge is added, execute \textbf{run\_lapw -p} and calculate the ELNES. This might take some time, so you may want to run it remotely using tmux so you can leave it overnight if need be.  Once done, calculate the DOS of the Lithium p states and the ELNES, which should look something like this (broadening = 0.5), if it all went well:  
 
 \includegraphics[scale=0.4]{./images/single_cell_hole_elnes.png}\\
 
-To make a supercell, run \textbf{x supercell} in the directory and make a 2$\times$1$\times$1.  Then use the same procedure to keep the symmetry broken: import to vesta, select P1 spacegroup, save cif, cif2struct, relabel an atom with a number, and then run \textbf{init\_lapw}.  Reduce K points by a factor of 2 (the unit cell is now twice as big), and keep the RKMax from earlier.  Insert a hole in case.inc, case.inm and then \textbf{run\_lapw}.  If everything goes well, this should give something like this: 
+To make a supercell, run \textbf{x supercell} in the directory and make a 2$\times$1$\times$1.  Then use the same procedure to keep the symmetry broken: import to vesta, select P1 spacegroup, save cif, cif2struct, relabel an atom with a number, and then run \textbf{init\_lapw}.  Reduce K points by a factor of 2 (the unit cell is now twice as big), and keep the RKMax from earlier.  Insert a hole in case.inc, case.inm and then \textbf{run\_lapw}.  If everything goes well, this should give something like this (broadening =0.5):  
 
 \includegraphics[scale=0.4]{./images/211_cell_hole_elnes.png}\\
 
-In this situation, this is sufficiently different (the peak locations change as well as their relative intensities) to justify a full 2$\times$2$\times$2 supercell calculation.  
+In this situation, this is sufficiently different (the peak locations change as well as their relative intensities) to justify a full 2$\times$2$\times$2 supercell calculation.  This ``full cell" calculation takes considerably more computing time (2-3 days) and lies on the border of what can reasonably be computed on a workstation, anything larger should be handled with a cluster.  Again, if all goes well it should look something like this (broadening 1.5):
+
+\includegraphics[scale=0.4]{./images/222_cell_hole_elnes.png}\\
+
+
 
 \section{Density Calculations}
 Density calculations can be done using either xcrysden (qualitative) or Critic2 (quantitative).
 
 
 \subsection{Xcrysden}
-Xcyrsden density rendering is well explained in the online wien2k tutorials to which the reader is referred to.  Depending on your particular setup, density rendering with xcrysden may need to be performed locally, which will also require install wien2k locally. 
+Xcyrsden density rendering is well explained in the online wien2k tutorials to which the reader is referred to.  Depending on your particular setup, density rendering with xcrysden may need to be performed locally, which will also require install wien2k locally.  For Li2CO3, the density looks something like: 
+
+\includegraphics[scale=0.3]{./images/density_plot_labeled.png}
+
+Qualitative investigation of plot shows the excited lithium atom (atom with a hole) distorting both the carbon and the oxygen electron clouds. The atomic basin appears smaller, defined by the ring of yellow surrounding the excited atom, although the entire region around the excited atom has experienced a net gain in electron count (more green than red).   These features suggest that there is a non negligible response from the material to the core hole.  
 
 \subsection{Critic2}
 The documentation for critic, while very complete, is in a giant txt file. The code takes three inputs: the case.struct file, the case.clmsum file, and an input parameters file ``more.cri".  A sample .cri file is below: 
@@ -399,6 +451,9 @@ If a calculation run apparently unchanged, a possible reason is that all the edi
 	\item \textbf{run\_lapw}
 	\item Increase Kpoints, run case specific calculations,  and/or loop back to and run forwards from there (ie increasing k points/RKMax does not require rerunning \textbf{init\_lapw}, but changing muffin tin radii does).
 \end{itemize}
+
+
+
 
 
 

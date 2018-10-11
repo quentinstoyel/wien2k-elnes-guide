@@ -1,18 +1,23 @@
 \BOOKMARK [1][-]{section.1}{Tools}{}% 1
-\BOOKMARK [1][-]{section.2}{Setup}{}% 2
-\BOOKMARK [1][-]{section.3}{Convergence}{}% 3
-\BOOKMARK [2][-]{subsection.3.1}{Cell parameters:}{section.3}% 4
-\BOOKMARK [2][-]{subsection.3.2}{K point and RKMax convergence}{section.3}% 5
-\BOOKMARK [1][-]{section.4}{TELNES3}{}% 6
-\BOOKMARK [2][-]{subsection.4.1}{Monopole effects}{section.4}% 7
-\BOOKMARK [1][-]{section.5}{Core Hole}{}% 8
-\BOOKMARK [1][-]{section.6}{Density Calculations}{}% 9
-\BOOKMARK [2][-]{subsection.6.1}{Xcrysden}{section.6}% 10
-\BOOKMARK [2][-]{subsection.6.2}{Critic2}{section.6}% 11
-\BOOKMARK [1][-]{section.7}{Common Errors/Issues Encountered in Wien2k}{}% 12
-\BOOKMARK [2][-]{subsection.7.1}{Setting RMT/RKMax}{section.7}% 13
-\BOOKMARK [2][-]{subsection.7.2}{Ghostbands}{section.7}% 14
-\BOOKMARK [2][-]{subsection.7.3}{NN in Optimization}{section.7}% 15
-\BOOKMARK [2][-]{subsection.7.4}{NR and NT}{section.7}% 16
-\BOOKMARK [2][-]{subsection.7.5}{GMax Value less than Gmin}{section.7}% 17
-\BOOKMARK [2][-]{subsection.7.6}{Ordering}{section.7}% 18
+\BOOKMARK [1][-]{section.2}{Path}{}% 2
+\BOOKMARK [1][-]{section.3}{Setup}{}% 3
+\BOOKMARK [2][-]{subsection.3.1}{Load Structure}{section.3}% 4
+\BOOKMARK [2][-]{subsection.3.2}{Initialization}{section.3}% 5
+\BOOKMARK [1][-]{section.4}{Convergence}{}% 6
+\BOOKMARK [2][-]{subsection.4.1}{Cell parameters:}{section.4}% 7
+\BOOKMARK [2][-]{subsection.4.2}{Setting the Muffin Tin Size}{section.4}% 8
+\BOOKMARK [2][-]{subsection.4.3}{K point and RKMax convergence}{section.4}% 9
+\BOOKMARK [1][-]{section.5}{Density of States}{}% 10
+\BOOKMARK [1][-]{section.6}{TELNES3}{}% 11
+\BOOKMARK [2][-]{subsection.6.1}{Monopole effects}{section.6}% 12
+\BOOKMARK [1][-]{section.7}{Core Hole}{}% 13
+\BOOKMARK [1][-]{section.8}{Density Calculations}{}% 14
+\BOOKMARK [2][-]{subsection.8.1}{Xcrysden}{section.8}% 15
+\BOOKMARK [2][-]{subsection.8.2}{Critic2}{section.8}% 16
+\BOOKMARK [1][-]{section.9}{Common Errors/Issues Encountered in Wien2k}{}% 17
+\BOOKMARK [2][-]{subsection.9.1}{Setting RMT/RKMax}{section.9}% 18
+\BOOKMARK [2][-]{subsection.9.2}{Ghostbands}{section.9}% 19
+\BOOKMARK [2][-]{subsection.9.3}{NN in Optimization}{section.9}% 20
+\BOOKMARK [2][-]{subsection.9.4}{NR and NT}{section.9}% 21
+\BOOKMARK [2][-]{subsection.9.5}{GMax Value less than Gmin}{section.9}% 22
+\BOOKMARK [2][-]{subsection.9.6}{Ordering}{section.9}% 23
