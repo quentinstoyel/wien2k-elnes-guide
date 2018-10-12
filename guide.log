@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017) (preloaded format=pdflatex 2018.9.12)  10 OCT 2018 14:46
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017) (preloaded format=pdflatex 2018.9.12)  12 OCT 2018 13:56
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1771,62 +1771,41 @@ File: ./images/hole_inm.png Graphic file (type png)
 Package pdftex.def Info: ./images/hole_inm.png used on input line 322.
 (pdftex.def)             Requested size: 232.02415pt x 46.40482pt.
 
-<./images/single_cell_hole_elnes.png, id=255, 642.4pt x 481.8pt>
-File: ./images/single_cell_hole_elnes.png Graphic file (type png)
+<./images/PDOS_no-hole.png, id=255, 642.4pt x 486.81876pt>
+File: ./images/PDOS_no-hole.png Graphic file (type png)
 
-<use ./images/single_cell_hole_elnes.png>
-Package pdftex.def Info: ./images/single_cell_hole_elnes.png used on input line
- 326.
-(pdftex.def)             Requested size: 256.95544pt x 192.71658pt.
+<use ./images/PDOS_no-hole.png>
+Package pdftex.def Info: ./images/PDOS_no-hole.png used on input line 328.
+(pdftex.def)             Requested size: 192.72148pt x 146.04675pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 326--327
+<./images/PDOS_hole.png, id=256, 633.36626pt x 482.80376pt>
+File: ./images/PDOS_hole.png Graphic file (type png)
 
- []
+<use ./images/PDOS_hole.png>
+Package pdftex.def Info: ./images/PDOS_hole.png used on input line 330.
+(pdftex.def)             Requested size: 190.01134pt x 144.84224pt.
 
-<./images/211_cell_hole_elnes.png, id=256, 645.41125pt x 481.8pt>
-File: ./images/211_cell_hole_elnes.png Graphic file (type png)
+<./images/full_hole_elnes.png, id=257, 648.4225pt x 485.815pt>
+File: ./images/full_hole_elnes.png Graphic file (type png)
 
-<use ./images/211_cell_hole_elnes.png>
-Package pdftex.def Info: ./images/211_cell_hole_elnes.png used on input line 33
-0.
-(pdftex.def)             Requested size: 258.15993pt x 192.71658pt.
+<use ./images/full_hole_elnes.png>
+Package pdftex.def Info: ./images/full_hole_elnes.png used on input line 337.
+(pdftex.def)             Requested size: 259.3644pt x 194.32256pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 330--331
-
- []
-
-[15 <./images/hole_inm.png> <./images/single_cell_hole_elnes.png> <./images/211
-_cell_hole_elnes.png>]
-<./images/222_cell_hole_elnes.png, id=262, 652.4375pt x 484.81125pt>
-File: ./images/222_cell_hole_elnes.png Graphic file (type png)
-
-<use ./images/222_cell_hole_elnes.png>
-Package pdftex.def Info: ./images/222_cell_hole_elnes.png used on input line 33
-4.
-(pdftex.def)             Requested size: 260.97037pt x 193.92105pt.
-
-Underfull \hbox (badness 10000) in paragraph at lines 334--335
+Underfull \hbox (badness 10000) in paragraph at lines 337--338
 
  []
 
-<./images/density_plot_labeled.png, id=263, 1296.34312pt x 683.55376pt>
+[15 <./images/hole_inm.png> <./images/PDOS_no-hole.png> <./images/PDOS_hole.png
+> <./images/full_hole_elnes.png>]
+<./images/density_plot_labeled.png, id=264, 1166.85938pt x 737.00343pt>
 File: ./images/density_plot_labeled.png Graphic file (type png)
 
 <use ./images/density_plot_labeled.png>
 Package pdftex.def Info: ./images/density_plot_labeled.png used on input line 3
-45.
-(pdftex.def)             Requested size: 388.90594pt x 205.0677pt.
- [16 <./images/222_cell_hole_elnes.png> <./images/density_plot_labeled.png>]
-Underfull \hbox (badness 10000) in paragraph at lines 360--361
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 362--363
-
- []
-
-
+49.
+(pdftex.def)             Requested size: 350.06052pt x 221.10274pt.
+ [16 <./images/density_plot_labeled.png>]
 Underfull \hbox (badness 10000) in paragraph at lines 364--365
 
  []
@@ -1841,114 +1820,124 @@ Underfull \hbox (badness 10000) in paragraph at lines 368--369
 
  []
 
-<./images/cro_cplist.png, id=269, 572.89032pt x 533.74406pt>
-File: ./images/cro_cplist.png Graphic file (type png)
-
-<use ./images/cro_cplist.png>
-Package pdftex.def Info: ./images/cro_cplist.png used on input line 370.
-(pdftex.def)             Requested size: 229.15207pt x 213.49384pt.
 
 Underfull \hbox (badness 10000) in paragraph at lines 370--371
 
  []
 
-[17]
+
 Underfull \hbox (badness 10000) in paragraph at lines 372--373
 
  []
 
+<./images/cro_cplist.png, id=272, 568.37344pt x 345.54094pt>
+File: ./images/cro_cplist.png Graphic file (type png)
+
+<use ./images/cro_cplist.png>
+Package pdftex.def Info: ./images/cro_cplist.png used on input line 374.
+(pdftex.def)             Requested size: 227.34535pt x 138.21391pt.
 
 Underfull \hbox (badness 10000) in paragraph at lines 374--375
 
  []
 
-<./images/integrals.png, id=280, 565.36218pt x 149.8097pt>
-File: ./images/integrals.png Graphic file (type png)
 
-<use ./images/integrals.png>
-Package pdftex.def Info: ./images/integrals.png used on input line 376.
-(pdftex.def)             Requested size: 282.68039pt x 74.90465pt.
+Underfull \hbox (badness 10000) in paragraph at lines 376--377
+
+ []
+
 
 Underfull \hbox (badness 10000) in paragraph at lines 378--379
 
  []
 
-<./images/spheres.png, id=281, 611.28375pt x 432.11438pt>
-File: ./images/spheres.png Graphic file (type png)
+<./images/integrals.png, id=273, 576.65437pt x 151.3153pt>
+File: ./images/integrals.png Graphic file (type png)
 
-<use ./images/spheres.png>
-Package pdftex.def Info: ./images/spheres.png used on input line 380.
-(pdftex.def)             Requested size: 244.50917pt x 172.84268pt.
-
-Underfull \hbox (badness 10000) in paragraph at lines 380--381
-
- []
-
-[18 <./images/cro_cplist.png> <./images/integrals.png> <./images/spheres.png>]
+<use ./images/integrals.png>
+Package pdftex.def Info: ./images/integrals.png used on input line 380.
+(pdftex.def)             Requested size: 288.32648pt x 75.65746pt.
+ [17 <./images/cro_cplist.png>]
 Underfull \hbox (badness 10000) in paragraph at lines 382--383
 
  []
 
+<./images/spheres.png, id=283, 628.59843pt x 354.57469pt>
+File: ./images/spheres.png Graphic file (type png)
+
+<use ./images/spheres.png>
+Package pdftex.def Info: ./images/spheres.png used on input line 384.
+(pdftex.def)             Requested size: 251.4349pt x 141.82736pt.
 
 Underfull \hbox (badness 10000) in paragraph at lines 384--385
 
  []
 
-<./images/low_rkmax.png, id=289, 462.528pt x 346.896pt>
+
+Underfull \hbox (badness 10000) in paragraph at lines 386--387
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 388--389
+
+ []
+
+[18 <./images/integrals.png> <./images/spheres.png>]
+<./images/low_rkmax.png, id=290, 462.528pt x 346.896pt>
 File: ./images/low_rkmax.png Graphic file (type png)
 
 <use ./images/low_rkmax.png>
-Package pdftex.def Info: ./images/low_rkmax.png used on input line 393.
+Package pdftex.def Info: ./images/low_rkmax.png used on input line 399.
 (pdftex.def)             Requested size: 231.26343pt x 173.44757pt.
 
-<./images/high_rkmax.png, id=290, 462.528pt x 346.896pt>
+<./images/high_rkmax.png, id=291, 462.528pt x 346.896pt>
 File: ./images/high_rkmax.png Graphic file (type png)
 
 <use ./images/high_rkmax.png>
-Package pdftex.def Info: ./images/high_rkmax.png used on input line 394.
+Package pdftex.def Info: ./images/high_rkmax.png used on input line 400.
 (pdftex.def)             Requested size: 231.26343pt x 173.44757pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 398--399
+Underfull \hbox (badness 10000) in paragraph at lines 404--405
 
  []
 
 [19 <./images/low_rkmax.png> <./images/high_rkmax.png>]
-Overfull \hbox (46.06883pt too wide) in paragraph at lines 418--419
+Overfull \hbox (46.06883pt too wide) in paragraph at lines 424--425
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][]
  []
 
-<./images/ghostbands.png, id=299, 417.81094pt x 335.00156pt>
+<./images/ghostbands.png, id=302, 417.81094pt x 335.00156pt>
 File: ./images/ghostbands.png Graphic file (type png)
 
 <use ./images/ghostbands.png>
-Package pdftex.def Info: ./images/ghostbands.png used on input line 423.
+Package pdftex.def Info: ./images/ghostbands.png used on input line 429.
 (pdftex.def)             Requested size: 334.2492pt x 268.0016pt.
- [20]
-<./images/gmax_err.png, id=308, 548.0475pt x 347.79938pt>
+ [20 <./images/ghostbands.png>]
+<./images/gmax_err.png, id=310, 548.0475pt x 347.79938pt>
 File: ./images/gmax_err.png Graphic file (type png)
 
 <use ./images/gmax_err.png>
-Package pdftex.def Info: ./images/gmax_err.png used on input line 443.
+Package pdftex.def Info: ./images/gmax_err.png used on input line 449.
 (pdftex.def)             Requested size: 274.02307pt x 173.89926pt.
- [21 <./images/ghostbands.png>]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 461.
- [22 <./images/gmax_err.png>]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 461.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 467.
+ [21 <./images/gmax_err.png>]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 467.
  (./guide.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 461.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 461.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 467.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 467.
 Package rerunfilecheck Info: File `guide.out' has not changed.
 (rerunfilecheck)             Checksum: A91CD8BEBFC6C9DDBC5C3588AEEA9F82;1353.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 461.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 467.
  ) 
 Here is how much of TeX's memory you used:
- 16904 strings out of 494941
- 290468 string characters out of 6180918
+ 16906 strings out of 494941
+ 290382 string characters out of 6180918
  356149 words of memory out of 5000000
- 19969 multiletter control sequences out of 15000+600000
+ 19971 multiletter control sequences out of 15000+600000
  10780 words of font info for 39 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 42i,8n,42p,10458b,1618s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 42i,8n,42p,10458b,1620s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/share/texlive/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc}</us
 r/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/shar
 e/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb></usr/share/texl
@@ -1959,10 +1948,10 @@ ype1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/p
 ublic/amsfonts/cm/cmtt12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/
 cm-super/sfbx1200.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/cm-supe
 r/sfrm1200.pfb>
-Output written on guide.pdf (22 pages, 2842774 bytes).
+Output written on guide.pdf (21 pages, 3095875 bytes).
 PDF statistics:
- 372 PDF objects out of 1000 (max. 8388607)
- 284 compressed objects within 3 object streams
+ 369 PDF objects out of 1000 (max. 8388607)
+ 282 compressed objects within 3 object streams
  85 named destinations out of 1000 (max. 500000)
  335 words of extra memory for PDF output out of 10000 (max. 10000000)
 

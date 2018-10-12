@@ -55,9 +55,9 @@ Here is the overall list of things that need to be done to rigorously obtain ELN
 	\item Volume convergence/structure optimization
 	\item Set RMT values
 	\item K point/RKmax convergence
-	\item Calculate DOS, PDOS
+	\item Calculate DOS
 	\item Calculate ELNES
-	\item Include Core Hole, if indicated by PDOS
+	\item Include Core Hole, if indicated by DOS, calculate PDOS
 	\item Calculate Screening from density
 	\item Calculate ELNES from partial hole
 \end{itemize}
@@ -321,18 +321,22 @@ In case.inc, a hole is inserted by changing the occupancy of an orbital, the tri
 
 \includegraphics[scale=0.5]{./images/hole_inm.png}
 
-The value is negative as this operation adds charge, not electron number.  Once the background charge is added, execute \textbf{run\_lapw -p} and calculate the ELNES. This might take some time, so you may want to run it remotely using tmux so you can leave it overnight if need be.  Once done, calculate the DOS of the Lithium p states and the ELNES, which should look something like this (broadening = 0.5), if it all went well:  
+The value is negative as this operation adds charge, not electron number.  Once the background charge is added, execute \textbf{run\_lapw -p} and calculate the ELNES. This might take some time, so you may want to run it remotely using tmux so you can leave it overnight if need be.  Once done, calculate the DOS of the Lithium p states and compare to the no hole case: 
 
-\includegraphics[scale=0.4]{./images/single_cell_hole_elnes.png}\\
 
-To make a supercell, run \textbf{x supercell} in the directory and make a 2$\times$1$\times$1.  Then use the same procedure to keep the symmetry broken: import to vesta, select P1 spacegroup, save cif, cif2struct, relabel an atom with a number, and then run \textbf{init\_lapw}.  Reduce K points by a factor of 2 (the unit cell is now twice as big), and keep the RKMax from earlier.  Insert a hole in case.inc, case.inm and then \textbf{run\_lapw}.  If everything goes well, this should give something like this (broadening =0.5):  
+\begin{figure}[H]
+	\includegraphics[scale=0.3]{./images/PDOS_no-hole.png}
+	~
+	\includegraphics[scale=0.3]{./images/PDOS_hole.png}
+	
+	\caption{Li P states from no-hole case (left) and hole case (right).  Note the dramatic peak growth at 4eV and 7 eV in the hole case, indicating excitonic effects.}
+\end{figure}
 
-\includegraphics[scale=0.4]{./images/211_cell_hole_elnes.png}\\
+ The dramatic differences in the unoccupied band when a core hole is introduced, combined with the significant fraction of total unoccupied states represented by the lithium band, indicates core hole effects in the ELNES.  Calculating the ELNES, should look something like this (broadening = 0.9), if it all went well:  
 
-In this situation, this is sufficiently different (the peak locations change as well as their relative intensities) to justify a full 2$\times$2$\times$2 supercell calculation.  This ``full cell" calculation takes considerably more computing time (2-3 days) and lies on the border of what can reasonably be computed on a workstation, anything larger should be handled with a cluster.  Again, if all goes well it should look something like this (broadening 1.5):
+\includegraphics[scale=0.4]{./images/full_hole_elnes.png}\\
 
-\includegraphics[scale=0.4]{./images/222_cell_hole_elnes.png}\\
-
+Having determined the need to include a core hole in the calculations, the next step is determining if the hole is shielded, which can be done using density calculations.
 
 
 \section{Density Calculations}
@@ -340,30 +344,30 @@ Density calculations can be done using either xcrysden (qualitative) or Critic2 
 
 
 \subsection{Xcrysden}
-Xcyrsden density rendering is well explained in the online wien2k tutorials to which the reader is referred to.  Depending on your particular setup, density rendering with xcrysden may need to be performed locally, which will also require install wien2k locally.  For Li2CO3, the density looks something like: 
+Xcyrsden density rendering is well explained in the online wien2k tutorials to which the reader is referred to.  Depending on your particular setup, density rendering with xcrysden may need to be performed locally, which will also require install wien2k locally.  For Li2O, the density looks something like: 
 
 \includegraphics[scale=0.3]{./images/density_plot_labeled.png}
 
-Qualitative investigation of plot shows the excited lithium atom (atom with a hole) distorting both the carbon and the oxygen electron clouds. The atomic basin appears smaller, defined by the ring of yellow surrounding the excited atom, although the entire region around the excited atom has experienced a net gain in electron count (more green than red).   These features suggest that there is a non negligible response from the material to the core hole.  
+Qualitative investigation of plot shows the excited lithium atom (atom with a hole) distorting the oxygen electron clouds. The atomic basin appears smaller, defined by the ring of yellow surrounding the excited atom, although the entire region around the excited atom has experienced a net gain in electron count (more green than red).   These features suggest that there is a non negligible response from the material to the core hole.  The regularity of the ground state lithium's appear to indicate that the distance between excited lithium atom is sufficient to isolate the core holes.  In this case this distance is more than 9\angstrom  { }which is considered suitable for this purpose.
 
 \subsection{Critic2}
-The documentation for critic, while very complete, is in a giant txt file. The code takes three inputs: the case.struct file, the case.clmsum file, and an input parameters file ``more.cri".  A sample .cri file is below: 
+While Xcrysden is ideal for qualitative analysis, Critic2 is better suited to quantifying electron density features. The documentation for critic, while very complete, is in a giant txt file. The code takes three inputs: the case.struct file, the case.clmsum file, and an input parameters file ``more.cri".  A sample .cri file is below: 
 
 \begin{lstlisting}
-crystal ./Li2CO3.struct
-load ./Li2CO3.clmsum ./Li2CO3.struct
+crystal ./Li2O.struct
+load ./Li2O.clmsum ./Li2O.struct
 auto
-integrals gauleg 50 50 cp 1 verbose
-sphereintegrals gauleg 50 50 cp 1 R0 1d-1 REND 2.0
+integrals gauleg 50 50 cp 2 verbose
+sphereintegrals gauleg 50 50 cp 2 R0 1d-1 REND 2.0
 \end{lstlisting}
 
-The first line inputs the crystal structure, and then tells the code where to find the clmsum/struct files in the second line.  \\
+The first line inputs the crystal structure, and the second line tells the code where to find the clmsum/struct files in the second line.  \\
 
 The third line determines the location of all the critical points.  \\
 
 The 4th line calculates the electron population inside the atomic basin surrounding critical point 1.  ``Gauleg" is an integration option, look in the critic documentation for more options.  The two 50's are sampling parameters, increase/decrease these for more/less accurate calculations.  \\
 
-The 5th line calculates the electron population in spheres surrounding critical point 1. ``gualeg 50 50" mean the exact same as on the previous line, R0 is the starting radius, 1d-1 sets the radius step size, REND is the final radius (in bohr).\\
+The 5th line calculates the electron population in spheres surrounding critical point 2. ``gualeg 50 50" mean the exact same as on the previous line, R0 is the starting radius, 1d-1 sets the radius step size, REND is the final radius (in bohr).\\
 
 The program is run using \textbf{\$ critic2 $<$ more.cri $>$ case.cro} in the command line in the case directory.  The final file (case.cro) is just where the output is stored and can be called anything.  To determine which critical points are needed for the integrals, look at the complete cp list in the output file: \\
 
@@ -379,9 +383,11 @@ The two values indicated by the arrows are the volume of the basin and how many 
 
 \includegraphics[scale=0.4]{./images/spheres.png}\\ 
 
-By matching to the volume value, relatively comparable values should be attainable (2.10 vs 2.14), in the no hole case.  The reason for performing two types of population calculation is due to the fact that the atomic basins can become ill defined when a core hole is inserted.  This is revealed when the volume of the basin is dramatically larger ($>$ 20\%) than the no hole case.  In these situations, a comparison of the sphere integrals at the same volume (set by the basin volume in the no hole case) is more appropriate.  \\
+By matching to the volume value, relatively comparable values should be attainable (2.14 vs 2.17), in the no hole case.  The reason for performing two types of population calculation is due to the fact that the atomic basins can become ill defined when a core hole is inserted.  This is revealed when the volume of the basin is dramatically larger ($>$ 20\%) than the no hole case.  In these situations, a comparison of the sphere integrals at the same volume (set by the basin volume in the no hole case) is more appropriate.  \\
 
-In the case of Li2CO3, the no hole case had a population of 2.11 and the no hole case had a population of 1.20 (and a smaller basin volume).  This indicates that the core hole is slightly screened and has an effective strength of (1.20 +1)-2.11 = 0.91.  The +1 is to account for the excited electron. To implement this effect, a third, final supercell calculation is required,  with a reduced hole inserted.  case.inc would need an occupancy of 1.09 and case.inm would need a background charge of -0.91. This can be rapidly set up by copying the struct file from the full hole calculation and initializing from there.\\
+In the case of Li2O, the no hole case had a population of 2.135 and the no hole case had a population of 1.283 (and a smaller basin volume).  This indicates that the core hole is slightly screened and has an effective strength of 2.135-1.283 = 0.852.  To implement this effect, a third, final supercell calculation is required,  with a reduced hole inserted.  case.inc would need an occupancy of 1.15 and case.inm would need a background charge of -0.85. This can be rapidly set up by copying the struct file from the full hole calculation and initializing from there.\\
+
+For this partial hole calculation, the only relevant property is the ELNES calculation as the DOS are somewhat unphysical.  This ELNES should represent the best agreement with experiment, if all has gone well and the calculations are converged with all aspects.  If all goes well, it should like this:   
 
   
 \section{Common Errors/Issues Encountered in Wien2k}
