@@ -42,7 +42,7 @@ Here's a list of software I use to run simulations.  I've put some installation 
 	
 	\item Xcrysden: \url{http://www.xcrysden.org/Download.html}.  Download the appropriate tar for your operating system, and make sure to select the semishared version.  Unzip it, and just run ``\$./xcrysden".  Add the executable to your path in .bashrc to be able to run it anywhere.
 	
-	\item Critic2: \url{https://github.com/aoterodelaroza/critic2}.  Download the zip from GitHub, unzip where you want to install it eg $\sim$/Programs or something), use your package manager (dnf/apt-get) to install  autoconf, automake, and your favourite flavour of fortran (if unsure, it is probably gfortran).  Then run the 4 commands from the readme: ``autoreconf -i", ``./configure", ``make", and ``(sudo) make install".   You may or may not need the sudo for the last one. 
+	\item Critic2: \url{https://github.com/aoterodelaroza/critic2}.  Download the zip from GitHub, unzip where you want to install it (eg $\sim$/Programs or something), use your package manager (dnf/apt-get) to install  autoconf, automake, and your favourite flavour of fortran (if unsure, it is probably gfortran).  Then run the 4 commands from the readme: ``autoreconf -i", ``./configure", ``make", and ``(sudo) make install".   You may or may not need the sudo for the last one. 
 	
 \end{itemize}
 	
@@ -50,7 +50,7 @@ Here's a list of software I use to run simulations.  I've put some installation 
 Here is the overall list of things that need to be done to rigorously obtain ELNES spectra with WIEN2k:
 
 \begin{itemize}
-	\item Load structure
+	\item Load a structure
 	\item Initialize
 	\item Volume convergence/structure optimization
 	\item Set RMT values
@@ -155,10 +155,10 @@ You can then ``run optimize.job" from w2web. This job is okay to run in the back
   
 \includegraphics[scale=0.3]{./images/E_vs_V.png}
 
-In the case of Li2O, the used lattice parameter of 4.6590 \angstrom results in the minimum energy, so no further changes are needed. If we needed a structure with a different lattice parameter, search the case directory for all the struct files and rename the appropriate one to case.struct, eg ``Li2O\_vol\_\_\_3.0.struct $\to$ Li2O.struct". Alternatively, cut and paste the lattice parameters from this file into the w2web structgen tool.    
+The important feature here is that the overall trend of the curve is clear, if too few k points are chosen, the points will be ``noisy." In the case of Li2O, the used lattice parameter of 4.6590\angstrom { }results in the minimum energy, so no further changes are needed. If we needed a structure with a different lattice parameter, search the case directory for all the struct files and rename the appropriate one to case.struct, eg ``Li2O\_vol\_\_\_3.0.struct $\to$ Li2O.struct". Alternatively, cut and paste the lattice parameters from this file into the w2web structgen tool.    
 
 \subsection{Setting the Muffin Tin Size}
-This is the first step of the process that is specific to calculating the Lithium ELNES.  In order to do this, te lithium 1S state needs to be treated as a core state.  This requires playing with the muffin tin radius and the energy cutoff value in lstart.  Rerun \textbf{init\_lapw} with no reduction in muffin tin size, and during lstart, use a cuutoff energy of -3.5 Ry (The Li 1 S state has an energy of -3.8 Ry).  Investigate the case.outputst file (it should pop up) for the following lines for the lithium atom and look at the 1S states: 
+This is the first step of the process that is specific to calculating the Lithium ELNES.  In order to have the ability to insert core holes, the lithium 1S state needs to be treated as a core state.  This requires playing with the muffin tin radius and the energy cutoff value in lstart.  Rerun \textbf{init\_lapw} with no reduction in muffin tin size, and during lstart, use a cuutoff energy of -3.5 Ry (The Li 1 S state has an energy of -3.8 Ry).  Investigate the case.outputst file (it should pop up) for the following lines for the lithium atom and look at the 1S states: 
 
 
 \begin{lstlisting}
@@ -170,7 +170,7 @@ This is the first step of the process that is specific to calculating the Lithiu
 
 \end{lstlisting}
 
-These indicate the core states (T/F), their energy levels (in this case $\sim$ -3.8eV) and how much the electrons in these states are contained in the muffin tins (0.9859).  As this is less than 1, it means that some 1S lithium electron is leaking out of the muffin tins, which is why there should now be all kinds of warnings popping up.  So go ahead and ``ctrl-c" out of init\_lapw.
+These indicate the core states (T/F), their energy levels (in this case $\sim$ -3.8eV) and how much the electrons in these states are contained in the muffin tins (0.9904).  As this is less than 1, it means that some 1S lithium electron is leaking out of the muffin tins, which is why there should now be all kinds of warnings popping up.  So go ahead and ``ctrl-c" out of init\_lapw.
 
 
 To fix the leakage problem, the Lithium muffin tins need to be bigger.   Ideally, they should be just big enough to hold all of the 1S electrons, without making them too different from the other muffin tins, as the larger this difference, the harder things get to calculate/converge.  In this case, try Li=2.0, O=1.8 and try init\_lapw again making sure to discard the suggested muffin tins from \textbf{setrmt}. If that still didn't work (lstart still has leakage errors), keep going until it does.  If the RMT values are too different (eg if $\mathrm{RMT_{Li}} \approx 1.5 \mathrm{RMT_O}$) they will cause errors  (ghostbands) further along.  The solution then is to try and minimize the leakage (and ignore the warnings) and acknowledge that it might be unavoidably causing artifacts. Once the spheres are set in the struct file, rerun \textbf{init\_lapw}.
@@ -236,7 +236,7 @@ Run \textbf{x tetra} and plot the DOS with dosplot, which should give you someth
 
 \includegraphics[scale=0.4]{./images/Li2O_dos.png}
 
-What we are looking for here is whether the conduction band has a large component of unoccupied lithium states, which it does in this case, indicated by the arrows.  If the unoccupied states were purely oxygen in nature, no core hole effect would be expected, as there would be no states to alter effecting the ELNES.  For more insight on this behavior, the reader is referred to Mauchamp, Jaouen and Schattschneider (2009) ``Core-hole effect in the one-particle approximation revisited from density functional theory.
+What we are looking for here is whether the conduction band has a large component of unoccupied lithium states, which it does in this case, indicated by the arrows.  If the unoccupied states were purely oxygen in nature, no core hole effect would be expected, as there would be no states to alter effecting the ELNES.  For more insight on this behavior, the reader is referred to Mauchamp, Jaouen and Schattschneider (2009) ``Core-hole effect in the one-particle approximation revisited from density functional theory."
 
 As there is indeed a large component of lithium states in the low conduction band, a core hole is necessary. Before that, we calculate an initial ELNES for comparison later.  
 
